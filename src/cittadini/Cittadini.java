@@ -37,6 +37,10 @@ public class Cittadini {
 		 */
 	}
 	
+	public void registraCittadino() {
+		
+	}
+	
 	public static void main(String[] args) {
 		
 	}
