@@ -6,6 +6,10 @@
 
 package cittadini;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.security.MessageDigest;
+
 import centrivaccinali.CentriVaccinali;
 
 public class Cittadini {
@@ -38,11 +42,43 @@ public class Cittadini {
 	}
 	
 	public void registraCittadino() {
-		
+		/*
+		 * Inserisce i campi dell'oggetto che invoca la funzione nel file Cittadini_Registrati.dati
+		 * (sha-256 per crittazione)
+		 */
 	}
+	
+	public String sha256(String base) {
+		/*
+		 * https://stackoverflow.com/questions/3103652/hash-string-via-sha-256-in-java/25243174#25243174 -- Spiegazione funzionamento codice
+		 */
+	    try{
+	        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	        byte[] hash = digest.digest(base.getBytes("UTF-8"));
+	        StringBuffer hexString = new StringBuffer();
+	        for (int i = 0; i < hash.length; i++) {
+	            String hex = Integer.toHexString(0xff & hash[i]);
+	            if(hex.length() == 1) hexString.append('0');
+	            hexString.append(hex);
+	        }
+	        return hexString.toString();
+	    } catch(Exception ex){
+	       throw new RuntimeException(ex);
+	    }
+	}
+	
+	//metodo LOGIN da fare quando si avrà un'idea più precisa
+	
+	//metodo InserisciEventiAvversi potrà essere invocato solo dopo aver effettuato il login
 	
 	public static void main(String[] args) {
 		
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Quale operazione vuoi eseguire?");
+		System.out.println("\n1) Registrati ");
+		System.out.println("2) Cerca un centro vaccinale");
+		System.out.println("3) Segnala eventi avversi post-vaccinazione");
+		System.out.println("\n> ");
 	}
-
+	
 }

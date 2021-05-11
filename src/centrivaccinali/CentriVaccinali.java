@@ -6,6 +6,8 @@
 
 package centrivaccinali;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
 public class CentriVaccinali {
@@ -53,6 +55,12 @@ public class CentriVaccinali {
 
 	public static void main(String[] args) {
 		// chiede all'utente di inserire ogni campo dell'Indirizzo
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Quale operazione vuoi eseguire?");
+		System.out.println("\n1) Registra nuovo centro");
+		System.out.println("2) Registra nuovo vaccinato");
+		System.out.println("\n> ");
 	}
 
 }
