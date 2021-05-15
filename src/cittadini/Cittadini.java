@@ -6,11 +6,12 @@
 
 package cittadini;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.Scanner;
 
 import centrivaccinali.CentriVaccinali;
+import menu.Menu;
 
 public class Cittadini {
 	
@@ -20,7 +21,7 @@ public class Cittadini {
 	String indirizzo_email;
 	String user_id;
 	String password;
-	String id_vaccinazione; // da capire in che cazzo di formato viene fornito
+	String id_vaccinazione;
 	
 	public void cercaCentroVaccinale(String nome_centro) {
 		// scegliere algoritmo di ricerca (pattern matching, bruteforce, boyer-moore)
@@ -71,14 +72,41 @@ public class Cittadini {
 	
 	//metodo InserisciEventiAvversi potrà essere invocato solo dopo aver effettuato il login
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		Scanner scanner = new Scanner(System.in);
 		System.out.println("Quale operazione vuoi eseguire?");
-		System.out.println("\n1) Registrati ");
+		System.out.println("\n1) Registrati");
 		System.out.println("2) Cerca un centro vaccinale");
 		System.out.println("3) Segnala eventi avversi post-vaccinazione");
-		System.out.println("\n> ");
+		System.out.println("0) Menu Principale");
+		System.out.print("\n> ");
+		
+		String choice = "";
+		do {
+			choice = scanner.next();
+			switch (choice) {
+				case "0":
+					Menu.main(null); // how to memory leak
+					break;
+				case "1":
+					System.out.println("Registrazione...");
+					break;
+				case "2":
+					System.out.println("Ricerca centro vaccinale...");
+					break;
+				case "3":
+					System.out.println("Segnalazione eventi avversi...");
+					break;
+				default:
+					System.out.println("Scelta non valida, riprova.");
+					choice = "";
+					break;
+			}
+		} while (choice == "");
+		
+		scanner.close();
+		
 	}
 	
 }
