@@ -6,26 +6,12 @@
 
 package menu;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import cittadini.Cittadini;
 import centrivaccinali.CentriVaccinali;
 
 public class Menu {
-	
-	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-	
-	public static String leggiString(String message) throws IOException {
-		System.out.print(message);
-		return in.readLine();
-	}
-	
-	public static int leggiInt(String message) throws IOException {
-		System.out.print(message);
-		return Integer.parseInt(in.readLine());
-	}
 
 	public static void main(String[] args) throws IOException {
 		
@@ -34,11 +20,10 @@ public class Menu {
 		System.out.println("\n1) Centri Vaccinali");
 		System.out.println("2) Cittadini");
 		System.out.println("0) Esci");
-		System.out.print("\n> ");
 		
 		String choice = "";
 		do {
-			choice = in.readLine();
+			choice = Utili.leggiString("\n> ");
 			switch (choice) {
 				case "0":
 					break;
@@ -54,8 +39,6 @@ public class Menu {
 					break;
 			}
 		} while (choice == "");
-
-		in.close();
 		
 	}
 

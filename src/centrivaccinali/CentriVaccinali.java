@@ -12,13 +12,18 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
 import menu.Menu;
+import menu.Utili;
 
 public class CentriVaccinali {
 	
 	String nome_centro;
 	Indirizzo indirizzo;
-	int tipologia;
+	String tipologia;
 	
+	/*
+	 * Ho tolto questo costruttore perché potremmo semplicemente modificare i campi
+	 * una volta creato l'oggetto, come facciamo con le altri classi (Cittadini ed Indirizzo)
+	 */
 //	public CentriVaccinali(String nome_centro, Indirizzo indirizzo, byte tipologia) {
 //		this.nome_centro = nome_centro;
 //		this.indirizzo = indirizzo;
@@ -27,21 +32,47 @@ public class CentriVaccinali {
 	
 	public static CentriVaccinali registraCentroVaccinale() throws IOException {
 		// crea il file Vaccinati_NomeCentroVaccinale.dati dove NomeCentroVaccinale viene sostituito dinamicamente
-		
 		CentriVaccinali centro = new CentriVaccinali();
 		System.out.println("Inserire le informazioni richieste:");
-		centro.nome_centro = Menu.leggiString("- Nome del centro > ");
+		centro.nome_centro = Utili.leggiString("- Nome del centro > ");
+		// TODO: Controllare se il centro con il nome inserito è già presente
 		
 		System.out.println("- Indirizzo:");
 		centro.indirizzo = new Indirizzo();
-		centro.indirizzo.qualificatore = Menu.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ");
-		centro.indirizzo.nome = Menu.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ");
-		centro.indirizzo.numero_civico = Menu.leggiString("    3. Numero Civico > ");
-		centro.indirizzo.comune = Menu.leggiString("    4. Comune > ");
-		centro.indirizzo.sigla_provincia = Menu.leggiString("    5. Sigla della Provincia > ");
-		centro.indirizzo.cap = Menu.leggiString("    6. CAP > ");
+		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ");
+		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ");
+		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ");
+		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ");
+		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ");
+		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ");
+		do {
+			centro.tipologia = Utili.leggiString("- Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ");
+			switch (centro.tipologia) {
+			case "1":
+				centro.tipologia = "Ospedaliero";
+				break;
+			case "2":
+				centro.tipologia = "Aziendale";
+				break;
+			case "3":
+				centro.tipologia = "Hub";
+				break;
+			default:
+				System.out.println("Scelta non valida, riprova");
+				centro.tipologia = "";
+				break;
+			}
+		} while (centro.tipologia == "");
 		
-		centro.tipologia = Menu.leggiInt("- Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ");
+		Utili.scriviSuFile("data/CentriVaccinali.dati", true,
+							String.format("\"%s\";\"%s\";\"%s\"\n",
+									centro.nome_centro,
+									centro.indirizzo.toString(),
+									centro.tipologia));
+		
+		String path = String.format("data/Vaccinati_%s.dati", centro.nome_centro);
+		Utili.creaFile(path);
+		Utili.scriviSuFile(path, true, "NOME_CENTRO;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE\n");
 		
 		return centro;
 	}
@@ -75,19 +106,7 @@ public class CentriVaccinali {
 	
 	@Override
 	public String toString() {
-		String str_tipologia = "";
-		switch (tipologia) {
-		case 1:
-			str_tipologia = "Ospedaliero";
-			break;
-		case 2:
-			str_tipologia = "Aziendale";
-			break;
-		case 3:
-			str_tipologia = "Hub";
-			break;
-		}
-		return String.format("Nome Centro: %s\nIndirizzo: %s\nTipologia: %s", nome_centro, indirizzo.toString(), str_tipologia);
+		return String.format("Nome Centro: %s\nIndirizzo: %s\nTipologia: %s", nome_centro, indirizzo.toString(), tipologia);
 	}
 
 	public static void main(String[] args) throws IOException {
