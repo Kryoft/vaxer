@@ -6,12 +6,9 @@
 
 package centrivaccinali;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
-import menu.Menu;
 import menu.Utili;
 
 public class CentriVaccinali {
@@ -112,19 +109,16 @@ public class CentriVaccinali {
 	public static void main(String[] args) throws IOException {
 		// chiede all'utente di inserire ogni campo dell'Indirizzo
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Quale operazione vuoi eseguire?");
 		System.out.println("\n1) Registra nuovo centro");
 		System.out.println("2) Registra nuovo vaccinato");
 		System.out.println("0) Menu Principale");
-		System.out.print("\n> ");
 		
 		String choice = "";
 		do {
-			choice = in.readLine();
+			choice = Utili.leggiString("\n> ");
 			switch (choice) {
 				case "0":
-					Menu.main(null); // lick my memory
 					break;
 				case "1":
 					CentriVaccinali nuovo = registraCentroVaccinale();
@@ -139,8 +133,6 @@ public class CentriVaccinali {
 					break;
 			}
 		} while (choice == "");
-		
-		in.close();
 		
 	}
 

@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import centrivaccinali.CentriVaccinali;
 import menu.Menu;
+import menu.Utili;
 
 public class Cittadini {
 	
@@ -74,20 +75,17 @@ public class Cittadini {
 	
 	public static void main(String[] args) throws IOException {
 		
-		Scanner scanner = new Scanner(System.in);
 		System.out.println("Quale operazione vuoi eseguire?");
 		System.out.println("\n1) Registrati");
 		System.out.println("2) Cerca un centro vaccinale");
 		System.out.println("3) Segnala eventi avversi post-vaccinazione");
 		System.out.println("0) Menu Principale");
-		System.out.print("\n> ");
 		
 		String choice = "";
 		do {
-			choice = scanner.next();
+			choice = Utili.leggiString("\n> ");
 			switch (choice) {
 				case "0":
-					Menu.main(null); // how to memory leak
 					break;
 				case "1":
 					System.out.println("Registrazione...");
@@ -104,8 +102,6 @@ public class Cittadini {
 					break;
 			}
 		} while (choice == "");
-		
-		scanner.close();
 		
 	}
 	
