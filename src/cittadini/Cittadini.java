@@ -8,10 +8,8 @@ package cittadini;
 
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.Scanner;
 
 import centrivaccinali.CentriVaccinali;
-import menu.Menu;
 import menu.Utili;
 
 public class Cittadini {
