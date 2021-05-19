@@ -15,7 +15,8 @@ public class Menu {
 
 	public static void main(String[] args) throws IOException {
 		
-		String choice = "";
+		String choice;
+		boolean exit = false;
 		
 		do {
 			//Menu principale usato per accedere ai main di Cittadini e CentriVaccinali;
@@ -27,21 +28,19 @@ public class Menu {
 			choice = Utili.leggiString("\n> ");
 			switch (choice) {
 				case "0":
+					exit = true;
 					break;
 				case "1":
 					CentriVaccinali.main(null);
-					choice = "";
 					break;
 				case "2":
 					Cittadini.main(null);
-					choice = "";
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");
-					choice = "";
 					break;
 			}
-		} while (choice == "");
+		} while (!exit);
 	}
 
 }

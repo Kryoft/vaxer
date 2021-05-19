@@ -11,6 +11,7 @@ public class Utili {
 	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	static FileWriter fw;
 	static BufferedWriter bw;
+	static long start_time;
 	
 	public static String leggiString(String message) throws IOException {
 		System.out.print(message);
@@ -41,6 +42,14 @@ public class Utili {
 	private static void chiudiWriter() throws IOException {
 		bw.close();
 		fw.close();
+	}
+	
+	public static void startTimer() {
+		start_time = System.currentTimeMillis();
+	}
+	
+	public static String stopTimer() {
+		return "Execution Time: " + (System.currentTimeMillis() - start_time) + "ms";
 	}
 	
 }

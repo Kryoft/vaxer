@@ -73,17 +73,20 @@ public class Cittadini {
 	
 	public static void main(String[] args) throws IOException {
 		
-		System.out.println("Quale operazione vuoi eseguire?");
-		System.out.println("\n1) Registrati");
-		System.out.println("2) Cerca un centro vaccinale");
-		System.out.println("3) Segnala eventi avversi post-vaccinazione");
-		System.out.println("0) Menu Principale");
+		String choice;
+		boolean exit = false;
 		
-		String choice = "";
 		do {
+			System.out.println("Quale operazione vuoi eseguire?");
+			System.out.println("\n1) Registrati");
+			System.out.println("2) Cerca un centro vaccinale");
+			System.out.println("3) Segnala eventi avversi post-vaccinazione");
+			System.out.println("0) Menu Principale");
+			
 			choice = Utili.leggiString("\n> ");
 			switch (choice) {
 				case "0":
+					exit = true;
 					break;
 				case "1":
 					System.out.println("Registrazione...");
@@ -96,10 +99,9 @@ public class Cittadini {
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");
-					choice = "";
 					break;
 			}
-		} while (choice == "");
+		} while (!exit);
 		
 	}
 	

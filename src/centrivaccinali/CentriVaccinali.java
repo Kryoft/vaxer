@@ -7,6 +7,8 @@
 package centrivaccinali;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
 import menu.Utili;
@@ -32,7 +34,11 @@ public class CentriVaccinali {
 		CentriVaccinali centro = new CentriVaccinali();
 		System.out.println("Inserire le informazioni richieste:");
 		centro.nome_centro = Utili.leggiString("- Nome del centro > ");
-		// TODO: Controllare se il centro con il nome inserito è già presente
+		
+		// Restituisce null se un file con quel nome esiste già
+		String path = String.format("data/Vaccinati_%s.dati", centro.nome_centro);
+		if (Files.exists(Paths.get(path)))
+			return null;
 		
 		System.out.println("- Indirizzo:");
 		centro.indirizzo = new Indirizzo();
@@ -67,9 +73,8 @@ public class CentriVaccinali {
 									centro.indirizzo.toString(),
 									centro.tipologia));
 		
-		String path = String.format("data/Vaccinati_%s.dati", centro.nome_centro);
 		Utili.creaFile(path);
-		Utili.scriviSuFile(path, true, "NOME_CENTRO;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE\n");
+		Utili.scriviSuFile(path, true, "NOME_CENTRO;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTO_AVVERSO;SEVERITA;NOTE_OPZIONALI\n");
 		
 		return centro;
 	}
@@ -95,7 +100,7 @@ public class CentriVaccinali {
 			if (ultimo_codice[i] == 'Z'+1) {
 				ultimo_codice[i] = 'A';
 				ultimo_codice[i-1]++;
-			}
+			} else break; // else break aggiunto da me (Cristian) per non fare cicli inutili
 		}
 		
 		return ultimo_codice;
@@ -109,30 +114,32 @@ public class CentriVaccinali {
 	public static void main(String[] args) throws IOException {
 		// chiede all'utente di inserire ogni campo dell'Indirizzo
 		
-		System.out.println("Quale operazione vuoi eseguire?");
-		System.out.println("\n1) Registra nuovo centro");
-		System.out.println("2) Registra nuovo vaccinato");
-		System.out.println("0) Menu Principale");
+		String choice;
+		boolean exit = false;
 		
-		String choice = "";
 		do {
+			System.out.println("Quale operazione vuoi eseguire?");
+			System.out.println("\n1) Registra nuovo centro");
+			System.out.println("2) Registra nuovo vaccinato");
+			System.out.println("0) Menu Principale");
+			
 			choice = Utili.leggiString("\n> ");
 			switch (choice) {
 				case "0":
+					exit = true;
 					break;
 				case "1":
 					CentriVaccinali nuovo = registraCentroVaccinale();
-					System.out.println(nuovo.toString());
+					System.out.println(nuovo == null ? "Operazione annullata: Un file con quel nome esiste già." : nuovo.toString());
 					break;
 				case "2":
 					System.out.println("Registrazione vaccinato...");
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");
-					choice = "";
 					break;
 			}
-		} while (choice == "");
+		} while (!exit);
 		
 	}
 
