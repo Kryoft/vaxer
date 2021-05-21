@@ -79,13 +79,31 @@ public class CentriVaccinali {
 		return centro;
 	}
 	
-	public void registraVaccinato(String nome_centro, String nome_cittadino, String cognome_cittadino, String codice_fiscale, SimpleDateFormat data_vaccinazione, String nome_vaccino, int id_vaccinazione) {
-		/*
-		 * Questa funzione verrà utilizzata dall'operatore sanitario, poco dopo aver vaccinato il cittadino. Per questo motivo,
-		 * l'id_vaccinato dovrà essere generato in quel momento.
-		 * Memorizza i dati del cittadino nel file Vaccinati_NomeCentroVaccinale.dati dove NomeCentroVaccinale
-		 * viene sostituito dinamicamente (eseguire algoritmo di ordinamento alla chiamata)
-		 */
+	//Modificato il valore restituito da void a boolean per restituire false se il centro vaccinale in cui si vogliono inserire i dati non esiste;
+	public boolean registraVaccinato(String nome_centro, String nome_cittadino, String cognome_cittadino, String codice_fiscale, SimpleDateFormat data_vaccinazione, String nome_vaccino, char[] ultimo_id_vaccinazione) throws IOException{
+		// Restituisce false se il file (centro vaccinale) in cui si vogliono inserire i dati non esiste;
+		String path = String.format("data/Vaccinati_%s.dati", nome_centro);
+		if(!Files.exists(Paths.get(path))) {
+			return false;
+		}
+		
+		//Genera una stringa con il nuovo id_vaccinazione partendo dall'ultimo ID che deve essere fornito come argomento;
+		String id_vaccinazione = new String(this.generaId(ultimo_id_vaccinazione));	//TODO capire come viene recuperato l'ultimo id di vaccinazione (file?);
+		
+		//Scrive sul file i nuovi dati
+		Utili.scriviSuFile(path, true,
+				String.format("%s;%s;%s;%s;%s;%s;%s",
+						id_vaccinazione,
+						nome_centro,
+						nome_cittadino,
+						cognome_cittadino,
+						codice_fiscale,
+						data_vaccinazione.toString(),
+						nome_vaccino));
+		
+		//TODO algoritmo di ordinamento dei dati su file Vaccinati_NomeCentroVaccinale.dati
+		
+		return true;
 	}
 	
 	public static void caricaDati() {
