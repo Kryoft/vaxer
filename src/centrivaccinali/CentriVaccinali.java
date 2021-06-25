@@ -33,7 +33,7 @@ public class CentriVaccinali {
 		// crea il file Vaccinati_NomeCentroVaccinale.dati dove NomeCentroVaccinale viene sostituito dinamicamente
 		CentriVaccinali centro = new CentriVaccinali();
 		System.out.println("Inserire le informazioni richieste:");
-		centro.nome_centro = Utili.leggiString("- Nome del centro > ");
+		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip();
 		
 		// Restituisce null se un file con quel nome esiste già
 		String path = String.format("data/Vaccinati_%s.dati", centro.nome_centro);
@@ -42,14 +42,14 @@ public class CentriVaccinali {
 		
 		System.out.println("- Indirizzo:");
 		centro.indirizzo = new Indirizzo();
-		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ");
-		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ");
-		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ");
-		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ");
-		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ");
-		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ");
+		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip();
+		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip();
+		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip();
+		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip();
+		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip();
+		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip();
 		do {
-			centro.tipologia = Utili.leggiString("- Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ");
+			centro.tipologia = Utili.leggiString("- Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ").strip();
 			switch (centro.tipologia) {
 			case "1":
 				centro.tipologia = "Ospedaliero";
@@ -101,7 +101,7 @@ public class CentriVaccinali {
 						data_vaccinazione.toString(),
 						nome_vaccino));
 		
-		//TODO algoritmo di ordinamento dei dati su file Vaccinati_NomeCentroVaccinale.dati
+		//TODO algoritmo di ordinamento dei dati su file Vaccinati_NomeCentroVaccinale.dati USARE INSERTION SORT
 		
 		return true;
 	}
@@ -141,7 +141,7 @@ public class CentriVaccinali {
 			System.out.println("2) Registra nuovo vaccinato");
 			System.out.println("0) Menu Principale");
 			
-			choice = Utili.leggiString("\n> ");
+			choice = Utili.leggiString("\n> ").strip();
 			switch (choice) {
 				case "0":
 					exit = true;

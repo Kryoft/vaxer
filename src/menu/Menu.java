@@ -25,7 +25,7 @@ public class Menu {
 			System.out.println("2) Cittadini");
 			System.out.println("0) Esci");
 			
-			choice = Utili.leggiString("\n> ");
+			choice = Utili.leggiString("\n> ").strip();
 			switch (choice) {
 				case "0":
 					exit = true;

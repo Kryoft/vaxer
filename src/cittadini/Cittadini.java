@@ -83,7 +83,7 @@ public class Cittadini {
 			System.out.println("3) Segnala eventi avversi post-vaccinazione");
 			System.out.println("0) Menu Principale");
 			
-			choice = Utili.leggiString("\n> ");
+			choice = Utili.leggiString("\n> ").strip();
 			switch (choice) {
 				case "0":
 					exit = true;
