@@ -23,13 +23,11 @@ public class Cittadini {
 	String id_vaccinazione;
 	
 	public void cercaCentroVaccinale(String nome_centro) {
-		// scegliere algoritmo di ricerca (pattern matching, bruteforce, boyer-moore)
-		// scegliere struttura dati da restituire
+		// Cercare i centri il cui nome contiene la stringa passata come argomento nel file CentriVaccinali.dati;
 	}
 	
 	public void cercaCentroVaccinale(String comune, byte tipologia) {
-		// scegliere algoritmo di ricerca (pattern matching, bruteforce, boyer-moore)
-		// scegliere struttura dati da restituire
+		// Cercare i centri il cui comune e tipologia corrispondono ai dati passati come argomento nel file CentriVaccinali.dati;
 	}
 	
 	public void visualizzaInfoCentroVaccinale(CentriVaccinali nome_centro) {
@@ -67,9 +65,11 @@ public class Cittadini {
 	    }
 	}
 	
-	//metodo LOGIN da fare quando si avrà un'idea più precisa
+	// Metodo LOGIN da fare quando si avrà un'idea più precisa;
 	
-	//metodo InserisciEventiAvversi potrà essere invocato solo dopo aver effettuato il login
+	public void inserisciEventiAvversi() {
+		// Può essere invocato solo dopo aver effettuato il login;
+	}
 	
 	public static void main(String[] args) throws IOException {
 		

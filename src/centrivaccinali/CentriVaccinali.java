@@ -87,10 +87,12 @@ public class CentriVaccinali {
 			return false;
 		}
 		
+		//TODO recupero ID di vaccinazione e creazione primo ID se nel file Vaccinati_NomeCentroVaccinale non è presente nessun vaccinato;
 		//Genera una stringa con il nuovo id_vaccinazione partendo dall'ultimo ID che deve essere fornito come argomento;
-		String id_vaccinazione = new String(this.generaId(ultimo_id_vaccinazione));	//TODO capire come viene recuperato l'ultimo id di vaccinazione (file?);
+		String id_vaccinazione = new String(this.generaId(ultimo_id_vaccinazione));
 		
-		//Scrive sul file i nuovi dati
+		//TODO modificare l'inserimento per aggiungere il nuovo vaccinato in testa al file;
+		//Scrive sul file i nuovi dati;
 		Utili.scriviSuFile(path, true,
 				String.format("%s;%s;%s;%s;%s;%s;%s",
 						id_vaccinazione,
@@ -101,19 +103,13 @@ public class CentriVaccinali {
 						data_vaccinazione.toString(),
 						nome_vaccino));
 		
-		//TODO algoritmo di ordinamento dei dati su file Vaccinati_NomeCentroVaccinale.dati USARE INSERTION SORT
-		
 		return true;
 	}
 	
-	public static void caricaDati() {
-		// inserisce in una struttura dati un oggetto di tipo CentriVaccinali per ogni centro contenuto nel file CentriVaccinali.dati
-	}
-	
 	private char[] generaId(char[] ultimo_codice) {
-		// il codice deve essere formato da 16 char tutti maiuscoli
 		
-		ultimo_codice[15]++;
+		//ultimo_codice è lungo 5 se identifica il centro vaccinale o 11 se identifica il cittadino;
+		ultimo_codice[ultimo_codice.length-1]++;
 		for (int i = ultimo_codice.length-1; i >= 0; i--) {
 			if (ultimo_codice[i] == 'Z'+1) {
 				ultimo_codice[i] = 'A';
