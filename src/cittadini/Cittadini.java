@@ -26,6 +26,8 @@ public class Cittadini {
 		// Cercare i centri il cui nome contiene la stringa passata come argomento nel file CentriVaccinali.dati;
 	}
 	
+	//NUOVO COMMENTO PER TEST;
+	
 	public void cercaCentroVaccinale(String comune, byte tipologia) {
 		// Cercare i centri il cui comune e tipologia corrispondono ai dati passati come argomento nel file CentriVaccinali.dati;
 	}
