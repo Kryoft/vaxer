@@ -10,9 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-import centrivaccinali.CentriVaccinali;
 import menu.Utili;
 
 public class Cittadini {
@@ -25,7 +24,7 @@ public class Cittadini {
 	String password;
 	String id_vaccinazione;
 	
-	public static void scegliCriterioRicerca() throws IOException {
+	public static ArrayList<String> scegliCriterioRicerca() throws IOException {
 		while (true) {
 			System.out.println("\n- Scelta Criterio di Ricerca -");
 			String ricerca_per = Utili.leggiString("Ricerca per:\n1) Nome Centro\n2) Comune e Tipologia\n\n> ");
@@ -33,47 +32,43 @@ public class Cittadini {
 			if (ricerca_per.equals("1")) {
 				System.out.println("\n- Ricerca per Nome -");
 				String centro = Utili.leggiString("Nome Centro > ").strip();
-				cercaCentroVaccinale(centro);
-				break;
+				return cercaCentroVaccinale(centro.toLowerCase());
 			} else if (ricerca_per.equals("2")) {
 				System.out.println("\n- Ricerca per Comune e Tipologia -");
 				String comune = Utili.leggiString("Comune del Centro > ").strip();
 				String tipologia = Utili.inserisciTipologiaCentro("Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ");
-				System.out.println();
-				cercaCentroVaccinale(comune, tipologia);
-				System.out.println();
-				break;
+				return cercaCentroVaccinale(comune, tipologia);
 			} else {
 				System.out.println("Scelta non valida, riprova");
 			}
 		}
 	}
 	
-	public static void cercaCentroVaccinale(String nome_centro) throws IOException {
+	public static ArrayList<String> cercaCentroVaccinale(String nome_centro) throws IOException {
 		// Cercare i centri il cui nome contiene la stringa passata come argomento nel file CentriVaccinali.dati;
 		BufferedReader br = new BufferedReader(new FileReader("data/CentriVaccinali.dati"));
+		ArrayList<String> centri_trovati = new ArrayList<>();
 		String str;
-		String[] columns = null;
+		String centro;
 		nome_centro = nome_centro.toLowerCase();
 		
 		while ((str = br.readLine()) != null) {
-			str = str.toLowerCase();
-			if (str.contains(nome_centro)) {
-				// splitto la riga solo successivamente aver controllato se contiene 'nome_centro'
-				// e non prima perché fare lo split di tutte le righe è più costoso in termini di performance.
-				columns = str.split(";");
-				if (columns[0].contains(nome_centro))
-					System.out.println("- " + columns[0]);
+			if (str.toLowerCase().contains(nome_centro)) {
+				centro = str.split(";")[0];
+				if (centro.toLowerCase().contains(nome_centro))
+					centri_trovati.add(str.replace("\"", ""));
+//					System.out.println("- " + str.substring(1, str.length()-1) + "\n");
 			}
 		}
-		System.out.println();
 		
 		br.close();
+		return centri_trovati;
 	}
 	
-	public static void cercaCentroVaccinale(String comune, String tipologia) throws IOException {
+	public static ArrayList<String> cercaCentroVaccinale(String comune, String tipologia) throws IOException {
 		// Cercare i centri il cui comune e tipologia corrispondono ai dati passati come argomento nel file CentriVaccinali.dati;
 		BufferedReader br = new BufferedReader(new FileReader("data/CentriVaccinali.dati"));
+		ArrayList<String> centri_trovati = new ArrayList<>();
 		String str;
 		String[] address = null;
 		String[] columns = null;
@@ -83,68 +78,62 @@ public class Cittadini {
 		
 		// Scorre tutte le righe del file;
 		while((str = br.readLine()) != null) {
-			str = str.toLowerCase();
-			if(str.contains(comune)) {
+			if(str.toLowerCase().contains(comune)) {
 				
 				// Splitta ogni riga in un array di stringhe;
-				columns = str.split(";");
+				columns = str.toLowerCase().split(";");
 				
 				// Se comune e tipologia sono contenute nelle rispettive colonne del file CentriVaccinali.dati allora stampa str; 
 				if(columns[2].contains(tipologia)) {
 					address = columns[1].split(",");
 					if(address[1].contains(comune)) {
 						
-						//Viene stampata l'intera stringa per aiutare l'utente a visualizzare eventuali errori di ricerca da lui commessi;
-						System.out.println("- " + str.replace("\"", "").replace(";", "; "));
+						centri_trovati.add(str.replace("\"", ""));
+						// Viene stampata l'intera stringa per aiutare l'utente a visualizzare eventuali errori di ricerca da lui commessi;
+//						System.out.println("- " + str.replace("\"", "").replace(";", "; "));
 					}
 				}
 			}
 		}
 		
 		br.close();
+		return centri_trovati;
 	}
 	
-	public static void visualizzaInfoCentroVaccinale(String nome_centro) throws IOException, NumberFormatException{
-		BufferedReader br = new BufferedReader(new FileReader("data/CentriVaccinali.dati"));
-		LinkedList<String> centriTrovati = new LinkedList<String>();	// Lista utilizzata per tenere traccia di tutti i centri vaccinali trovati in modo da permettere all'utente di selezionarne uno;
+	public static void visualizzaInfoCentroVaccinale() throws IOException {
+		ArrayList<String> centri_trovati = scegliCriterioRicerca(); // Lista utilizzata per tenere traccia di tutti i centri vaccinali trovati in modo da permettere all'utente di selezionarne uno;
 		String[] columns = null;
 		String str;
-		int scelta;	// Integer utilizzato per far selezionare all'utente un centro vaccinale nella lista centriTrovati;
-		int counter = 0;
-		
-		nome_centro = nome_centro.toLowerCase();
+		int scelta;	// Integer utilizzato per far selezionare all'utente un centro vaccinale nella lista centri_trovati;
+		int counter = 1;
 		
 		System.out.println("\n- Centri Trovati -");
-		while ((str = br.readLine()) != null) {
-			str = str.toLowerCase();
-			if (str.contains(nome_centro)) {
-				columns = str.split(";");
-				if (columns[0].contains(nome_centro)) {
-					centriTrovati.add(str);	// Aggiunge l'intera stringa del file CentriVaccinali.dati corrispondente al centro alla linkedList centriTrovati;
-					System.out.println(counter++ + ") " + columns[0]);	// Stampa in output il centro, con associato il numero da utilizzare per accedervi nella linkedList ed ottenere le info;
-				}
-			}
+		for (String centro : centri_trovati) {
+			System.out.println(counter++ + ") " + centro.substring(0, centro.indexOf(';')) + "\n");
 		}
 		
 		// Se sono stati trovati dei centri l'utente può selezionarne uno;
-		if(centriTrovati.size() > 0) {
+		if(centri_trovati.size() > 0) {
 			do {
-				scelta = Integer.parseInt(Utili.leggiString("\nSeleziona uno dei centri sopra elencati per visualizzarne le informazioni: "));
-			} while(scelta < 0 || scelta > centriTrovati.size());
+				try {
+				scelta = Integer.parseInt(Utili.leggiString("Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: "));
+				} catch (NumberFormatException nfe) {
+					// se non inserisce un numero imposto scelta a -1 così richiede all'utente di inserire un numero valido
+					scelta = -1;
+				}
+			} while(scelta <= 0 || scelta > centri_trovati.size());
 			
-			str = centriTrovati.get(scelta);	// Recupera dalla lista centriTrovati il centro selezionato dall'utente;
+			str = centri_trovati.get(--scelta);	// Recupera dalla lista centriTrovati il centro selezionato dall'utente;
 			columns = str.split(";");
-			str = String.format("Nome Centro: %s\nIndirizzo: %s\nTipologia: %s\n", columns[0], columns[1], columns[2]).replace("\"", "");	// Costruisce la stringa di output per le informazioni sul centro vaccinale;
 			System.out.println("\n- Informazioni -");
-			System.out.println(str);
+			// Costruisce e stampa la stringa di output per le informazioni sul centro vaccinale;
+			System.out.println(String.format("Nome Centro: %s\nIndirizzo: %s\nTipologia: %s\n", columns[0], columns[1], columns[2]).replace("\"", ""));
 			
 			//TODO tramite il nome del centro cercare tutti i vaccinati nel centro di riferimento utilizzando il file Cittadini_Vaccinati.dati per mostrare la tabella riassuntiva degli eventi avversi segnalati;
 			
 		} else {
 			System.out.println("Non ci sono centri con questo nome\n");
 		}
-		
-		br.close();
 	}
 	
 	public void registraCittadino() {
@@ -186,8 +175,8 @@ public class Cittadini {
 		
 		do {
 			System.out.println("- Menu Cittadini -");
-			System.out.println("Quale operazione vuoi eseguire?");
-			System.out.println("\n1) Registrati");
+			System.out.println("Quale operazione vuoi eseguire?\n");
+			System.out.println("1) Registrati");
 			System.out.println("2) Cerca un centro vaccinale");
 			System.out.println("3) Visualizza informazioni centro vaccinale");
 			System.out.println("4) Segnala eventi avversi post-vaccinazione");
@@ -202,11 +191,13 @@ public class Cittadini {
 					System.out.println("Registrazione...");
 					break;
 				case "2":
-					scegliCriterioRicerca();
+					ArrayList<String> centri_trovati = scegliCriterioRicerca();
+					for (String centro : centri_trovati)
+						System.out.println("- " + centro.substring(0, centro.indexOf(';')));
 					break;
 				case "3":
 					System.out.println("\n- Visualizzazione Informazioni Centro -");
-					visualizzaInfoCentroVaccinale(Utili.leggiString("Nome Centro > ").strip());
+					visualizzaInfoCentroVaccinale();
 					break;
 				case "4":
 					System.out.println("Segnalazione eventi avversi...");
