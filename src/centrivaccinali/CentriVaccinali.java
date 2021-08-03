@@ -20,34 +20,29 @@ public class CentriVaccinali {
 	String tipologia;
 	
 	/*
-	 * Ho tolto questo costruttore perché potremmo semplicemente modificare i campi
-	 * una volta creato l'oggetto, come facciamo con le altri classi (Cittadini ed Indirizzo)
+	 * Costruttore rimosso perchè si andranno a modificare i campi una volta creato l'oggetto, come per le altre classi.
 	 */
-//	public CentriVaccinali(String nome_centro, Indirizzo indirizzo, byte tipologia) {
-//		this.nome_centro = nome_centro;
-//		this.indirizzo = indirizzo;
-//		this.tipologia = tipologia;
-//	}
 	
 	public static CentriVaccinali registraCentroVaccinale() throws IOException {
-		// crea il file Vaccinati_NomeCentroVaccinale.dati dove NomeCentroVaccinale viene sostituito dinamicamente
+		// Inizializza un oggetto "CentriVaccinali" e successivamente richiede le informazioni necessarie all'utente;
 		CentriVaccinali centro = new CentriVaccinali();
+		
 		System.out.println("Inserire le informazioni richieste:");
 		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip();
-		
-		// Restituisce null se un file con quel nome esiste già
-		String path = String.format("data/Vaccinati_%s.dati", centro.nome_centro);
-		if (Files.exists(Paths.get(path)))
-			return null;
-		
 		System.out.println("- Indirizzo:");
+		
+		// Inizializza un oggetto "Indirizzo";
 		centro.indirizzo = new Indirizzo();
+		
+		// Inserimento di tutti i campi di indirizzo;
 		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip();
 		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip();
 		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip();
 		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip();
 		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip();
 		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip();
+		
+		// Selezione della tipologia di centro vaccinale;
 		do {
 			centro.tipologia = Utili.leggiString("- Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ").strip();
 			switch (centro.tipologia) {
@@ -67,15 +62,14 @@ public class CentriVaccinali {
 			}
 		} while (centro.tipologia == "");
 		
+		// Scrive sul file CentriVaccinali.dati il nuovo centro vaccinale. Crea il file se non esiste già;
 		Utili.scriviSuFile("data/CentriVaccinali.dati", true,
-							String.format("\"%s\";\"%s\";\"%s\"\n",
+							String.format("\"%s\";\"%s\";\"%s\"",
 									centro.nome_centro,
 									centro.indirizzo.toString(),
 									centro.tipologia));
 		
-		Utili.creaFile(path);
-		Utili.scriviSuFile(path, true, "NOME_CENTRO;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTO_AVVERSO;SEVERITA;NOTE_OPZIONALI\n");
-		
+		// Restituisce il nuovo centro vaccinale;
 		return centro;
 	}
 	
