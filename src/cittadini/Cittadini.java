@@ -64,9 +64,37 @@ public class Cittadini {
 		br.close();
 	}
 	
-	public static void cercaCentroVaccinale(String comune, String tipologia) {
+	public static void cercaCentroVaccinale(String comune, String tipologia) throws IOException {
 		// Cercare i centri il cui comune e tipologia corrispondono ai dati passati come argomento nel file CentriVaccinali.dati;
-		System.out.println("blob...");
+		BufferedReader br = new BufferedReader(new FileReader("data/CentriVaccinali.dati"));
+		String str;
+		String[] address = null;
+		String[] columns = null;
+		
+		comune = comune.toLowerCase();
+		tipologia = tipologia.toLowerCase();
+		
+		// Scorre tutte le righe del file;
+		while((str = br.readLine()) != null) {
+			str = str.toLowerCase();
+			if(str.contains(comune)) {
+				
+				// Splitta ogni riga in un array di stringhe;
+				columns = str.split(";");
+				
+				// Se comune e tipologia sono contenute nelle rispettive colonne del file CentriVaccinali.dati allora stampa str; 
+				if(columns[2].contains(tipologia)) {
+					address = columns[1].split(",");
+					if(address[1].contains(comune)) {
+						
+						//Viene stampata l'intera stringa per aiutare l'utente a visualizzare eventuali errori di ricerca da lui commessi;
+						System.out.println("- " + str.replace("\"", "").replace(";", "; "));
+					}
+				}
+			}
+		}
+		
+		br.close();
 	}
 	
 	public void visualizzaInfoCentroVaccinale(CentriVaccinali nome_centro) {
