@@ -1,3 +1,9 @@
+/*
+ * Davide Spinelli, 744151, CO
+ * Cristian Corti, 744359, CO
+ * Manuel Marceca, 746494, CO
+ */
+
 package menu;
 
 import java.io.BufferedReader;
@@ -18,11 +24,6 @@ public class Utili {
 		return in.readLine();
 	}
 	
-	public static int leggiInt(String message) throws IOException {
-		System.out.print(message);
-		return Integer.parseInt(in.readLine());
-	}
-	
 	public static void scriviSuFile(String path, boolean append, String testo) throws IOException {
 		inizializzaWriter(path, append);
 		bw.append(testo);
@@ -32,6 +33,23 @@ public class Utili {
 	public static void creaFile(String path) throws IOException {
 		inizializzaWriter(path, false);
 		chiudiWriter();
+	}
+	
+	public static String inserisciTipologiaCentro(String message) throws IOException {
+		while (true) {
+			String tipologia = leggiString(message);
+			switch (tipologia) {
+			case "1":
+				return "Ospedaliero";
+			case "2":
+				return "Aziendale";
+			case "3":
+				return "Hub";
+			default:
+				System.out.println("Scelta non valida, riprova");
+				break;
+			}
+		}
 	}
 	
 	private static void inizializzaWriter(String path, boolean append) throws IOException {

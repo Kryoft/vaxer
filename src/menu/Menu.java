@@ -8,9 +8,6 @@ package menu;
 
 import java.io.IOException;
 
-import cittadini.Cittadini;
-import centrivaccinali.CentriVaccinali;
-
 public class Menu {
 
 	public static void main(String[] args) throws IOException {
@@ -31,10 +28,10 @@ public class Menu {
 					exit = true;
 					break;
 				case "1":
-					CentriVaccinali.main(null);
+					centrivaccinali.CentriVaccinali.main(null);
 					break;
 				case "2":
-					Cittadini.main(null);
+					cittadini.Cittadini.main(null);
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");

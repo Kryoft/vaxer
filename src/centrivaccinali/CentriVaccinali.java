@@ -28,39 +28,19 @@ public class CentriVaccinali {
 		CentriVaccinali centro = new CentriVaccinali();
 		
 		System.out.println("Inserire le informazioni richieste:");
-		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip();
+		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip().replace(";", "");
 		System.out.println("- Indirizzo:");
 		
 		// Inizializza un oggetto "Indirizzo";
 		centro.indirizzo = new Indirizzo();
-		
-		// Inserimento di tutti i campi di indirizzo;
-		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip();
-		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip();
-		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip();
-		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip();
-		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip();
-		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip();
-		
-		// Selezione della tipologia di centro vaccinale;
-		do {
-			centro.tipologia = Utili.leggiString("- Tipologia:\n\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ").strip();
-			switch (centro.tipologia) {
-			case "1":
-				centro.tipologia = "Ospedaliero";
-				break;
-			case "2":
-				centro.tipologia = "Aziendale";
-				break;
-			case "3":
-				centro.tipologia = "Hub";
-				break;
-			default:
-				System.out.println("Scelta non valida, riprova");
-				centro.tipologia = "";
-				break;
-			}
-		} while (centro.tipologia == "");
+		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip().replace(";", "");
+		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip().replace(";", "");
+		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip().replace(";", "");
+		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip().replace(";", "");
+		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip().replace(";", "");
+		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip().replace(";", "");
+		centro.tipologia = Utili.inserisciTipologiaCentro("- Tipologia:\n1) Ospedaliero\n2) Aziendale\n3) Hub\n\n> ");
+		System.out.println();
 		
 		// Scrive sul file CentriVaccinali.dati il nuovo centro vaccinale. Crea il file se non esiste già;
 		Utili.scriviSuFile("data/CentriVaccinali.dati", true,
@@ -75,6 +55,13 @@ public class CentriVaccinali {
 	
 	//Modificato il valore restituito da void a boolean per restituire false se il centro vaccinale in cui si vogliono inserire i dati non esiste;
 	public boolean registraVaccinato(String nome_centro, String nome_cittadino, String cognome_cittadino, String codice_fiscale, SimpleDateFormat data_vaccinazione, String nome_vaccino, char[] ultimo_id_vaccinazione) throws IOException{
+		/* 
+		 * Campi per il file Cittadini_Vaccinati:
+		 * NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI
+		 * Esempio di severità e note opzionali:
+		 * ;"4, 0, 0, 0, 0, 0";"mi fa male la testa, *, *, *, *, *"
+		 */
+		
 		// Restituisce false se il file (centro vaccinale) in cui si vogliono inserire i dati non esiste;
 		String path = String.format("data/Vaccinati_%s.dati", nome_centro);
 		if(!Files.exists(Paths.get(path))) {
@@ -138,7 +125,7 @@ public class CentriVaccinali {
 					break;
 				case "1":
 					CentriVaccinali nuovo = registraCentroVaccinale();
-					System.out.println(nuovo == null ? "Operazione annullata: Un file con quel nome esiste già." : nuovo.toString());
+					System.out.println(nuovo == null ? "Operazione annullata: Un file con quel nome esiste già." : nuovo.toString() + "\n");
 					break;
 				case "2":
 					System.out.println("Registrazione vaccinato...");
