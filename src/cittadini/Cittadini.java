@@ -77,16 +77,16 @@ public class Cittadini {
 		tipologia = tipologia.toLowerCase();
 		
 		// Scorre tutte le righe del file;
-		while((str = br.readLine()) != null) {
-			if(str.toLowerCase().contains(comune)) {
+		while ((str = br.readLine()) != null) {
+			if (str.toLowerCase().contains(comune)) {
 				
 				// Splitta ogni riga in un array di stringhe;
 				columns = str.toLowerCase().split(";");
 				
 				// Se comune e tipologia sono contenute nelle rispettive colonne del file CentriVaccinali.dati allora stampa str; 
-				if(columns[2].contains(tipologia)) {
+				if (columns[2].contains(tipologia)) {
 					address = columns[1].split(",");
-					if(address[1].contains(comune)) {
+					if (address[1].contains(comune)) {
 						
 						centri_trovati.add(str.replace("\"", ""));
 						// Viene stampata l'intera stringa per aiutare l'utente a visualizzare eventuali errori di ricerca da lui commessi;
@@ -109,19 +109,20 @@ public class Cittadini {
 		
 		System.out.println("\n- Centri Trovati -");
 		for (String centro : centri_trovati) {
-			System.out.println(counter++ + ") " + centro.substring(0, centro.indexOf(';')) + "\n");
+			System.out.println(counter++ + ") " + centro.substring(0, centro.indexOf(';')));
 		}
+		System.out.println();
 		
 		// Se sono stati trovati dei centri l'utente può selezionarne uno;
-		if(centri_trovati.size() > 0) {
+		if (centri_trovati.size() > 0) {
 			do {
 				try {
-				scelta = Integer.parseInt(Utili.leggiString("Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: "));
+					scelta = Integer.parseInt(Utili.leggiString("Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: "));
 				} catch (NumberFormatException nfe) {
 					// se non inserisce un numero imposto scelta a -1 così richiede all'utente di inserire un numero valido
 					scelta = -1;
 				}
-			} while(scelta <= 0 || scelta > centri_trovati.size());
+			} while (scelta <= 0 || scelta > centri_trovati.size());
 			
 			str = centri_trovati.get(--scelta);	// Recupera dalla lista centriTrovati il centro selezionato dall'utente;
 			columns = str.split(";");
@@ -194,9 +195,9 @@ public class Cittadini {
 					ArrayList<String> centri_trovati = scegliCriterioRicerca();
 					for (String centro : centri_trovati)
 						System.out.println("- " + centro.substring(0, centro.indexOf(';')));
+					System.out.println();
 					break;
 				case "3":
-					System.out.println("\n- Visualizzazione Informazioni Centro -");
 					visualizzaInfoCentroVaccinale();
 					break;
 				case "4":
