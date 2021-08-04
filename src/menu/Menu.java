@@ -18,11 +18,11 @@ public class Menu {
 		do {
 			//Menu principale usato per accedere ai main di Cittadini e CentriVaccinali;
 			System.out.println("A quale sezione vuoi accedere?");
-			System.out.println("\n1) Centri Vaccinali");
+			System.out.println(Utili.new_line + "1) Centri Vaccinali");
 			System.out.println("2) Cittadini");
 			System.out.println("0) Esci");
 			
-			choice = Utili.leggiString("\n> ").strip();
+			choice = Utili.leggiString(Utili.new_line + "> ").strip();
 			switch (choice) {
 				case "0":
 					exit = true;

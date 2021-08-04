@@ -12,12 +12,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class Utili {
+public abstract class Utili {
 	
 	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	static FileWriter fw;
 	static BufferedWriter bw;
 	static long start_time;
+	public static String new_line = System.getProperty("line.separator");  // https://stackoverflow.com/questions/36796136/difference-between-system-getpropertyline-separator-and-n
 	
 	public static String leggiString(String message) throws IOException {
 		System.out.print(message);
