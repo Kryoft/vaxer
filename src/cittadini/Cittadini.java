@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.List;
 
 import menu.Utili;
 
@@ -63,6 +62,8 @@ public class Cittadini {
 		String centro;
 		nome_centro = nome_centro.toLowerCase();
 		
+		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
+		
 		while ((str = br.readLine()) != null) {
 			if (str.toLowerCase().contains(nome_centro)) {
 				centro = str.split(";")[0];
@@ -86,6 +87,8 @@ public class Cittadini {
 		
 		comune = comune.toLowerCase();
 		tipologia = tipologia.toLowerCase();
+		
+		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
 		
 		// Scorre tutte le righe del file;
 		while ((str = br.readLine()) != null) {
@@ -121,7 +124,7 @@ public class Cittadini {
 			System.out.println("Non ho trovato centri con questo nome" + Utili.new_line);
 		else {
 			System.out.println(Utili.new_line + "- Centri Trovati -");
-			int scelta = selezionaCentro(centri_trovati, "Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: ");
+			int scelta = selezionaCentro(centri_trovati, "Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: ", "Annulla");
 			
 			if (scelta == 0)
 				return;
@@ -142,14 +145,14 @@ public class Cittadini {
 		}
 	}
 	
-	public static int selezionaCentro(ArrayList<String> centri_trovati, String messaggio_di_scelta) throws IOException {
+	public static int selezionaCentro(ArrayList<String> centri_trovati, String messaggio_di_scelta, String messaggio_di_annullamento) throws IOException {
 		int scelta;  // Integer utilizzato per far selezionare all'utente un centro vaccinale nella lista centri_trovati;
 		int counter = 1;
 		
 		for (String centro : centri_trovati) {
 			System.out.println(counter++ + ") " + centro.substring(0, centro.indexOf(';')));
 		}
-		System.out.println("0) Annulla " + Utili.new_line);
+		System.out.println("0) " + messaggio_di_annullamento + Utili.new_line);
 		
 		do {
 			try {
@@ -200,25 +203,6 @@ public class Cittadini {
 		
 		raf.seek(raf.length());  // imposta la posizione del puntatore del RAF alla fine del file
 		raf.writeBytes(riga);
-		
-		// Questa parte di codice permette di leggere l'ultima riga di un file senza scorrerne
-		// tutte le righe con il BufferedReader
-		// ----
-		/*
-		 * Leggo a partire da raf.length()-2 perché:
-		 * 1) se leggessi da raf.length(), raf.readByte() lancerebbe una EOFException
-		 * perché tenterei di leggere dalla fine del file;
-		 * 2) se leggessi da raf.length()-1 leggerei subito il carattere '\n' perché è l'ultimo che
-		 * viene scritto (o forse non leggerei niente perché il '\n' occupa 2 bytes https://stackoverflow.com/questions/15290203/why-is-a-newline-2-bytes-in-windows).
-		 * Se appunto chiamassi raf.readLine() otterrei null
-		 */
-//		long index = raf.length()-2;
-//		do {
-//			raf.seek(index--);
-//		} while (raf.readByte() != '\n');
-//		
-//		System.out.println(raf.readLine());
-		// ----
 		
 		raf.close();
 	}
