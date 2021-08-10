@@ -64,7 +64,7 @@ public abstract class Utili {
 			return null;
 		
 		String line;
-		raf = new RandomAccessFile(file_path, "r");
+		raf = new RandomAccessFile(file_path, "r");  // "r" = read, "rw" = read and write
 		
 		/*
 		 * Leggo a partire da raf.length()-2 perché:

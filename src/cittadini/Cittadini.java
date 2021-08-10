@@ -66,7 +66,7 @@ public class Cittadini {
 		
 		while ((str = br.readLine()) != null) {
 			if (str.toLowerCase().contains(nome_centro)) {
-				centro = str.split(";")[0];
+				centro = str.split(";")[0];						//sostituibile con un for o un substring?
 				if (centro.toLowerCase().contains(nome_centro))
 					centri_trovati.add(str.replace("\"", ""));
 //					System.out.println("- " + str.substring(1, str.length()-1) + "\n");
@@ -186,7 +186,7 @@ public class Cittadini {
 		cittadino.nome = Utili.leggiString("- Nome > ").strip().replace(";", "");
 		cittadino.cognome = Utili.leggiString("- Cognome > ").strip().replace(";", "");
 		cittadino.codice_fiscale = Utili.leggiString("- Codice Fiscale > ").strip().replace(";", "");
-		cittadino.indirizzo_email = Utili.leggiString("- Indirizzo e-mail > ").strip().replace(";", "");
+		cittadino.indirizzo_email = Utili.leggiString("- Indirizzo e-mail > ").strip().replace(";", "");	//(opzionale) controllo se si tratta di una email
 		cittadino.user_id = Utili.leggiString("- User ID > ").strip().replace(";", "");
 		cittadino.password = sha256(Utili.leggiString("- Password > "));
 		cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "");

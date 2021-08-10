@@ -133,7 +133,7 @@ public class CentriVaccinali {
 		}
 		
 		if (!Files.exists(Paths.get(file_path)))
-			Utili.scriviSuFile(file_path, true, "NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI");
+			Utili.scriviSuFile(file_path, true, "NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI" + Utili.new_line);
 		
 		Utili.scriviSuFile(file_path, true, String.format("\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"\";\"\"%s",
 				nome_cittadino,
