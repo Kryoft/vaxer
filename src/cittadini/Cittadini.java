@@ -232,15 +232,16 @@ public class Cittadini {
 		// Può essere invocato solo dopo aver effettuato il login;
 		
 		String choice = "";
+		int check = -1;	//Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal complatore;
 		int severita[] = new int[6];
 		String note[] = new String[6];
 		
 		int sintomo_selezionato;
 		
-		while(!choice.equals("0")){
+		do {	
 			
-			while(true) {
-			
+			do {
+				
 				System.out.println(Utili.new_line + "SEGNALAZIONE EVENTI AVVERSI");
 				Utili.aCapo(2);
 				System.out.println("Selezionare il sintomo incontrato");
@@ -251,40 +252,37 @@ public class Cittadini {
 				System.out.println("5) Tachicardia");
 				System.out.println("6) Crisi ipertensiva");
 				System.out.println("0) Termina");
-
+				
 				try {
 					choice = Utili.leggiString(Utili.new_line + "> ").strip();
-					int check = Integer.parseInt(choice);
-					if(check >= 0 && check <= 6) break;
-					else System.out.println("ERRORE: selezione non esistente");
-				}catch(NumberFormatException e) {System.out.println(Utili.new_line + "ERRORE: risposta non valida");}
-						
-			}
+					check = Integer.parseInt(choice);
+				} catch(NumberFormatException e) {
+					System.out.println(Utili.new_line + "ERRORE: risposta non valida");
+				}
+				
+			} while(check < 0 || check >= 6);
 			
 			if(!choice.equals("0")) {
-			
-				sintomo_selezionato = Integer.parseInt(choice) - 1;
+				sintomo_selezionato = Integer.parseInt(choice) - 1;	//Variabile utilizzata per identificare la posizione del sintomo nell'array severita;
 						
-				while(true) {
+				do {
 					try{
 						severita[sintomo_selezionato] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.new_line + ">"));
-						if(severita[sintomo_selezionato] >= 1 && severita[sintomo_selezionato] <= 5) break;
+					} catch(NumberFormatException e) {
+						System.out.println(Utili.new_line + "ERRORE: risposta non valida");
 					}
-					catch(NumberFormatException e) {System.out.println(Utili.new_line + "ERRORE: risposta non valida");}
-				}
+				} while(severita[sintomo_selezionato] < 1 || severita[sintomo_selezionato] > 5);
 						
 				if(Utili.leggiSiNo("Desideri aggiungere una nota?")) {
-					while(true) {
-						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.new_line + ">");
-						if(note[sintomo_selezionato].length() <= 256) break;
-						System.out.println(Utili.new_line + "ERRORE: Limite caratteri superato");
-					}
-				}
 					
-			
+					do {
+						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.new_line + ">");
+					} while(note[sintomo_selezionato].length() > 256);
+					
+				}	
 			}
-		}
-		
+			
+		} while(!choice.equals("0"));
 		
 		//MEMORIZZARE SU FILE I DATI NEGLI ARRAI severita[] E note[]
 		
