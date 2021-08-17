@@ -191,7 +191,7 @@ public class Cittadini {
 		cittadino.password = sha256(Utili.leggiString("- Password > "));
 		cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "");
 		
-		String riga = String.format("\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";%s", 
+		String riga = String.format("\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\"%s", 
 				cittadino.nome,
 				cittadino.cognome,
 				cittadino.codice_fiscale,
@@ -228,9 +228,69 @@ public class Cittadini {
 	
 	// Metodo LOGIN da fare quando si avrà un'idea più precisa;
 	
-	public void inserisciEventiAvversi() {
+	public static void inserisciEventiAvversi() throws IOException {
 		// Può essere invocato solo dopo aver effettuato il login;
+		
+		String choice = "";
+		int severita[] = new int[6];
+		String note[] = new String[6];
+		
+		int sintomo_selezionato;
+		
+		while(!choice.equals("0")){
+			
+			while(true) {
+			
+				System.out.println(Utili.new_line + "SEGNALAZIONE EVENTI AVVERSI");
+				Utili.aCapo(2);
+				System.out.println("Selezionare il sintomo incontrato");
+				System.out.println(Utili.new_line + "1) Mal di testa");
+				System.out.println("2) Febbre");
+				System.out.println("3) Dolori muscolari e articolari");
+				System.out.println("4) Linfoadenopatia");
+				System.out.println("5) Tachicardia");
+				System.out.println("6) Crisi ipertensiva");
+				System.out.println("0) Termina");
+
+				try {
+					choice = Utili.leggiString(Utili.new_line + "> ").strip();
+					int check = Integer.parseInt(choice);
+					if(check >= 0 && check <= 6) break;
+					else System.out.println("ERRORE: selezione non esistente");
+				}catch(NumberFormatException e) {System.out.println(Utili.new_line + "ERRORE: risposta non valida");}
+						
+			}
+			
+			if(!choice.equals("0")) {
+			
+				sintomo_selezionato = Integer.parseInt(choice) - 1;
+						
+				while(true) {
+					try{
+						severita[sintomo_selezionato] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.new_line + ">"));
+						if(severita[sintomo_selezionato] >= 1 && severita[sintomo_selezionato] <= 5) break;
+					}
+					catch(NumberFormatException e) {System.out.println(Utili.new_line + "ERRORE: risposta non valida");}
+				}
+						
+				if(Utili.leggiSiNo("Desideri aggiungere una nota?")) {
+					while(true) {
+						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.new_line + ">");
+						if(note[sintomo_selezionato].length() <= 256) break;
+						System.out.println(Utili.new_line + "ERRORE: Limite caratteri superato");
+					}
+				}
+					
+			
+			}
+		}
+		
+		
+		//MEMORIZZARE SU FILE I DATI NEGLI ARRAI severita[] E note[]
+		
 	}
+	
+	
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -264,7 +324,8 @@ public class Cittadini {
 					visualizzaInfoCentroVaccinale();
 					break;
 				case "4":
-					System.out.println("Segnalazione eventi avversi...");
+					//System.out.println("Segnalazione eventi avversi...");
+					inserisciEventiAvversi();
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");

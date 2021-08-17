@@ -29,6 +29,25 @@ public abstract class Utili {
 		return in.readLine();
 	}
 	
+	public static boolean leggiSiNo(String message) throws IOException {
+		while(true) {
+			String s = leggiString(message);
+			switch(s.toLowerCase()) {
+			case "s", "si", "sì":
+				return true;
+			case "n", "no":
+				return false;
+			default:
+				System.out.println("ERRORE: risposta non valida");
+				break;
+			}
+		}
+	}
+	
+	public static void aCapo(int n) {
+		for(int i = 0; i < n; i++) System.out.println();
+	}
+	
 	public static void scriviSuFile(String path, boolean append, String testo) throws IOException {
 		inizializzaWriter(path, append);
 		bw.append(testo);
