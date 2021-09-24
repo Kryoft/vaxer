@@ -27,26 +27,26 @@ public class Cittadini {
 	
 	public static ArrayList<String> scegliCriterioRicerca() throws IOException {
 		while (true) {
-			System.out.println(Utili.new_line + "- Scelta Criterio di Ricerca -");
+			System.out.println(Utili.NEW_LINE + "- Scelta Criterio di Ricerca -");
 			String ricerca_per = Utili.leggiString(String.format("Ricerca per:%s1) Nome Centro%s2) Comune e Tipologia%s%s> ",
-																	Utili.new_line,
-																	Utili.new_line,
-																	Utili.new_line,
-																	Utili.new_line));
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE));
 			
 			if (ricerca_per.equals("1")) {
-				System.out.println(Utili.new_line + "- Ricerca per Nome -");
+				System.out.println(Utili.NEW_LINE + "- Ricerca per Nome -");
 				String centro = Utili.leggiString("Nome Centro > ").strip();
-				return cercaCentroVaccinale(centro.toLowerCase());
+				return cercaCentroVaccinale(centro);
 			} else if (ricerca_per.equals("2")) {
-				System.out.println(Utili.new_line + "- Ricerca per Comune e Tipologia -");
+				System.out.println(Utili.NEW_LINE + "- Ricerca per Comune e Tipologia -");
 				String comune = Utili.leggiString("Comune del Centro > ").strip();
 				String tipologia = Utili.inserisciTipologiaCentro(String.format("- Tipologia:%s1) Ospedaliero%s2) Aziendale%s3) Hub%s%s> ",
-																	Utili.new_line,
-																	Utili.new_line,
-																	Utili.new_line,
-																	Utili.new_line,
-																	Utili.new_line));
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE,
+																	Utili.NEW_LINE));
 				return cercaCentroVaccinale(comune, tipologia);
 			} else {
 				System.out.println("Scelta non valida, riprova");
@@ -68,7 +68,7 @@ public class Cittadini {
 			if (str.toLowerCase().contains(nome_centro)) {
 				centro = str.split(";")[0];						//sostituibile con un for o un substring?
 				if (centro.toLowerCase().contains(nome_centro))
-					centri_trovati.add(str.replace("\"", ""));
+					centri_trovati.add(str);
 //					System.out.println("- " + str.substring(1, str.length()-1) + "\n");
 			}
 		}
@@ -102,9 +102,9 @@ public class Cittadini {
 					address = columns[1].split(",");
 					if (address[1].contains(comune)) {
 						
-						centri_trovati.add(str.replace("\"", ""));
+						centri_trovati.add(str);
 						// Viene stampata l'intera stringa per aiutare l'utente a visualizzare eventuali errori di ricerca da lui commessi;
-//						System.out.println("- " + str.replace("\"", "").replace(";", "; "));
+//						System.out.println("- " + str.replace(";", "; "));
 					}
 				}
 			}
@@ -121,9 +121,9 @@ public class Cittadini {
 		
 		// Se sono stati trovati dei centri l'utente può selezionarne uno;
 		if (centri_trovati.isEmpty())
-			System.out.println("Non ho trovato centri con questo nome" + Utili.new_line);
+			System.out.println("Non ho trovato centri con questo nome" + Utili.NEW_LINE);
 		else {
-			System.out.println(Utili.new_line + "- Centri Trovati -");
+			System.out.println(Utili.NEW_LINE + "- Centri Trovati -");
 			int scelta = selezionaCentro(centri_trovati, "Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: ", "Annulla");
 			
 			if (scelta == 0)
@@ -131,15 +131,15 @@ public class Cittadini {
 			
 			str = centri_trovati.get(--scelta);	// Recupera dalla lista centriTrovati il centro selezionato dall'utente;
 			columns = str.split(";");
-			System.out.println(Utili.new_line + "- Informazioni -");
+			System.out.println(Utili.NEW_LINE + "- Informazioni -");
 			// Costruisce e stampa la stringa di output per le informazioni sul centro vaccinale;
 			System.out.println(String.format("Nome Centro: %s%sIndirizzo: %s%sTipologia: %s%s",
 												columns[0],
-												Utili.new_line,
+												Utili.NEW_LINE,
 												columns[1],
-												Utili.new_line,
+												Utili.NEW_LINE,
 												columns[2],
-												Utili.new_line).replace("\"", ""));
+												Utili.NEW_LINE));
 			
 			//TODO tramite il nome del centro cercare tutti i vaccinati nel centro di riferimento utilizzando il file Cittadini_Vaccinati.dati per mostrare la tabella riassuntiva degli eventi avversi segnalati;
 		}
@@ -152,7 +152,7 @@ public class Cittadini {
 		for (String centro : centri_trovati) {
 			System.out.println(counter++ + ") " + centro.substring(0, centro.indexOf(';')));
 		}
-		System.out.println("0) " + messaggio_di_annullamento + Utili.new_line);
+		System.out.println("0) " + messaggio_di_annullamento + Utili.NEW_LINE);
 		
 		do {
 			try {
@@ -179,19 +179,19 @@ public class Cittadini {
 		RandomAccessFile raf = new RandomAccessFile("data/Cittadini_Registrati.dati", "rw");
 		
 		if (raf.length() == 0)
-			raf.writeBytes("NOME;COGNOME;CODICE_FISCALE;EMAIL;USER_ID;PASSWORD;ID_VACCINAZIONE" + Utili.new_line);
+			raf.writeBytes("NOME;COGNOME;CODICE_FISCALE;EMAIL;USER_ID;PASSWORD;ID_VACCINAZIONE" + Utili.NEW_LINE);
 		
 		Cittadini cittadino = new Cittadini();
 		
 		cittadino.nome = Utili.leggiString("- Nome > ").strip().replace(";", "");
 		cittadino.cognome = Utili.leggiString("- Cognome > ").strip().replace(";", "");
 		cittadino.codice_fiscale = Utili.leggiString("- Codice Fiscale > ").strip().replace(";", "");
-		cittadino.indirizzo_email = Utili.leggiString("- Indirizzo e-mail > ").strip().replace(";", "");	//(opzionale) controllo se si tratta di una email
+		cittadino.indirizzo_email = Utili.leggiString("- Indirizzo e-mail > ").strip().replace(";", "");	// (opzionale) controllo se si tratta di una email
 		cittadino.user_id = Utili.leggiString("- User ID > ").strip().replace(";", "");
 		cittadino.password = sha256(Utili.leggiString("- Password > "));
 		cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "");
 		
-		String riga = String.format("\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\"%s", 
+		String riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
 				cittadino.nome,
 				cittadino.cognome,
 				cittadino.codice_fiscale,
@@ -199,7 +199,7 @@ public class Cittadini {
 				cittadino.user_id,
 				cittadino.password,
 				cittadino.id_vaccinazione,
-				Utili.new_line);
+				Utili.NEW_LINE);
 		
 		raf.seek(raf.length());  // imposta la posizione del puntatore del RAF alla fine del file
 		raf.writeBytes(riga);
@@ -211,13 +211,13 @@ public class Cittadini {
 		/*
 		 * https://stackoverflow.com/questions/3103652/hash-string-via-sha-256-in-java/25243174#25243174 -- Spiegazione funzionamento codice
 		 */
-	    try{
+	    try {
 	        MessageDigest digest = MessageDigest.getInstance("SHA-256");
 	        byte[] hash = digest.digest(base.getBytes("UTF-8"));
 	        StringBuffer hexString = new StringBuffer();
 	        for (int i = 0; i < hash.length; i++) {
 	            String hex = Integer.toHexString(0xff & hash[i]);
-	            if(hex.length() == 1) hexString.append('0');
+	            if (hex.length() == 1) hexString.append('0');
 	            hexString.append(hex);
 	        }
 	        return hexString.toString();
@@ -232,20 +232,17 @@ public class Cittadini {
 		// Può essere invocato solo dopo aver effettuato il login;
 		
 		String choice = "";
-		int check = -1;	//Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal complatore;
+		int check = -1;	// Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal complatore;
 		int severita[] = new int[6];
 		String note[] = new String[6];
 		
 		int sintomo_selezionato;
 		
-		do {	
-			
+		do {
 			do {
-				
-				System.out.println(Utili.new_line + "SEGNALAZIONE EVENTI AVVERSI");
-				Utili.aCapo(2);
-				System.out.println("Selezionare il sintomo incontrato");
-				System.out.println(Utili.new_line + "1) Mal di testa");
+				System.out.println(Utili.NEW_LINE + "- Segnalazione Eventi Avversi - " + Utili.NEW_LINE);
+				System.out.println("Selezionare il sintomo riscontrato" + Utili.NEW_LINE);
+				System.out.println("1) Mal di testa");
 				System.out.println("2) Febbre");
 				System.out.println("3) Dolori muscolari e articolari");
 				System.out.println("4) Linfoadenopatia");
@@ -254,41 +251,36 @@ public class Cittadini {
 				System.out.println("0) Termina");
 				
 				try {
-					choice = Utili.leggiString(Utili.new_line + "> ").strip();
+					choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
 					check = Integer.parseInt(choice);
 				} catch(NumberFormatException e) {
-					System.out.println(Utili.new_line + "ERRORE: risposta non valida");
+					System.out.println(Utili.NEW_LINE + "ERRORE: risposta non valida");
 				}
-				
 			} while(check < 0 || check >= 6);
 			
-			if(!choice.equals("0")) {
+			if (!choice.equals("0")) {
 				sintomo_selezionato = Integer.parseInt(choice) - 1;	//Variabile utilizzata per identificare la posizione del sintomo nell'array severita;
 						
 				do {
-					try{
-						severita[sintomo_selezionato] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.new_line + ">"));
+					try {
+						severita[sintomo_selezionato] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.NEW_LINE + "> "));
 					} catch(NumberFormatException e) {
-						System.out.println(Utili.new_line + "ERRORE: risposta non valida");
+						System.out.println(Utili.NEW_LINE + "ERRORE: risposta non valida");
 					}
-				} while(severita[sintomo_selezionato] < 1 || severita[sintomo_selezionato] > 5);
+				} while (severita[sintomo_selezionato] < 1 || severita[sintomo_selezionato] > 5);
 						
-				if(Utili.leggiSiNo("Desideri aggiungere una nota?")) {
-					
+				if (Utili.leggiSiNo("Desideri aggiungere una nota?")) {
 					do {
-						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.new_line + ">");
-					} while(note[sintomo_selezionato].length() > 256);
-					
+						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.NEW_LINE + "> ");
+					} while (note[sintomo_selezionato].length() > 256);
 				}	
 			}
 			
 		} while(!choice.equals("0"));
 		
-		//MEMORIZZARE SU FILE I DATI NEGLI ARRAI severita[] E note[]
+		// MEMORIZZARE SU FILE I DATI NEGLI ARRAY severita[] E note[]
 		
 	}
-	
-	
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -297,14 +289,14 @@ public class Cittadini {
 		
 		do {
 			System.out.println("- Menu Cittadini -");
-			System.out.println("Quale operazione vuoi eseguire?" + Utili.new_line);
+			System.out.println("Quale operazione vuoi eseguire?" + Utili.NEW_LINE);
 			System.out.println("1) Registrati");
 			System.out.println("2) Cerca un centro vaccinale");
 			System.out.println("3) Visualizza informazioni centro vaccinale");
 			System.out.println("4) Segnala eventi avversi post-vaccinazione");
 			System.out.println("0) Menu Principale");
 			
-			choice = Utili.leggiString(Utili.new_line + "> ").strip();
+			choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
 			switch (choice) {
 				case "0":
 					exit = true;
@@ -322,8 +314,8 @@ public class Cittadini {
 					visualizzaInfoCentroVaccinale();
 					break;
 				case "4":
-					//System.out.println("Segnalazione eventi avversi...");
 					inserisciEventiAvversi();
+					System.out.println();
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");

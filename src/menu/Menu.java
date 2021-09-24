@@ -17,24 +17,27 @@ public class Menu {
 		
 		do {
 			//Menu principale usato per accedere ai main di Cittadini e CentriVaccinali;
-			System.out.println("A quale sezione vuoi accedere?");
-			System.out.println(Utili.new_line + "1) Centri Vaccinali");
+			System.out.println("- Menu Principale -");
+			System.out.println("A quale sezione vuoi accedere?" + Utili.NEW_LINE);
+			System.out.println("1) Centri Vaccinali");
 			System.out.println("2) Cittadini");
 			System.out.println("0) Esci");
 			
-			choice = Utili.leggiString(Utili.new_line + "> ").strip();
+			choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
 			switch (choice) {
 				case "0":
 					exit = true;
 					break;
 				case "1":
+					System.out.println();
 					centrivaccinali.CentriVaccinali.main(null);
 					break;
 				case "2":
+					System.out.println();
 					cittadini.Cittadini.main(null);
 					break;
 				default:
-					System.out.println("Scelta non valida, riprova.");
+					System.out.println(Utili.NEW_LINE + "Scelta non valida, riprova." + Utili.NEW_LINE);
 					break;
 			}
 		} while (!exit);

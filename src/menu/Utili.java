@@ -21,7 +21,7 @@ public abstract class Utili {
 	static FileWriter fw;
 	static BufferedWriter bw;
 	static long start_time;
-	public static String new_line = System.getProperty("line.separator");  // https://stackoverflow.com/questions/36796136/difference-between-system-getpropertyline-separator-and-n
+	public static final String NEW_LINE = System.getProperty("line.separator");  // https://stackoverflow.com/questions/36796136/difference-between-system-getpropertyline-separator-and-n
 	static RandomAccessFile raf;
 	
 	public static String leggiString(String message) throws IOException {
@@ -31,7 +31,7 @@ public abstract class Utili {
 	
 	public static boolean leggiSiNo(String message) throws IOException {
 		while(true) {
-			String s = leggiString(message);
+			String s = leggiString(message + " (Sì / No)" + NEW_LINE + "> ");
 			switch(s.toLowerCase()) {
 			case "s", "si", "sì":
 				return true;
@@ -42,10 +42,6 @@ public abstract class Utili {
 				break;
 			}
 		}
-	}
-	
-	public static void aCapo(int n) {
-		for(int i = 0; i < n; i++) System.out.println();
 	}
 	
 	public static void scriviSuFile(String path, boolean append, String testo) throws IOException {
@@ -87,10 +83,10 @@ public abstract class Utili {
 		
 		/*
 		 * Leggo a partire da raf.length()-2 perché:
-		 * 1) se leggessi da raf.length(), raf.readByte() lancerebbe una EOFException
+		 * 1) se leggessi da raf.length(), raf.readByte() lancerebbe una EOFException (End Of File Exception)
 		 * perché tenterei di leggere dalla fine del file;
 		 * 2) se leggessi da raf.length()-1 leggerei subito il carattere '\n' perché è l'ultimo che
-		 * viene scritto (o forse non leggerei niente perché il '\n' occupa 2 bytes https://stackoverflow.com/questions/15290203/why-is-a-newline-2-bytes-in-windows).
+		 * viene scritto (o forse non leggerei niente perché '\n' occupa 2 bytes https://stackoverflow.com/questions/15290203/why-is-a-newline-2-bytes-in-windows).
 		 * Se appunto chiamassi raf.readLine() otterrei null
 		 */
 		long index = raf.length()-2;

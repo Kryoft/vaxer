@@ -1,8 +1,11 @@
 NOME;INDIRIZZO;TIPOLOGIA
-"Centro 1";"Via prima, 1 Como (CO) 22100";"Ospedaliero"
-"0";"00 0, 0 000 (0) 0";"Hub"
-"Centro di Gravità Permanente";"via Franco Battiato, 727 Mediaset (RAI) 666";"Ospedaliero"
-"sos";"sos sos, sos sos (sos) sos";"Ospedaliero"
-"Milano Hub";"Via Roma, 23 Milano (MI) 23850";"Aziendale"
-"Milano Hub";"Via Barba, 28 Milano (MI) 20019";"Hub"
-"sike";"bike yikes, 432 Nike (KKK) pello";"Hub"
+Centro 1;Via prima, 1 Como (CO) 22100;Ospedaliero
+0;00 0, 0 000 (0) 0;Hub
+Centro di Gravità Permanente;via Franco Battiato, 727 Mediaset (RAI) 666;Ospedaliero
+sos;sos sos, sos sos (sos) sos;Ospedaliero
+Milano Hub;Via Roma, 23 Milano (MI) 23850;Aziendale
+Milano Hub;Via Barba, 28 Milano (MI) 20019;Hub
+sike;bike yikes, 432 Nike (KKK) pello;Hub
+Dumbo;Piazza Elefanti Verdi, 4 Privato (PV) 00532;Aziendale
+Centro 1;Via prima, 1 Como (CO) 22100;Ospedaliero
+Bubu;Strada III, 43 KO (KO) 38594;Hub
