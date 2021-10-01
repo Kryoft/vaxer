@@ -189,7 +189,9 @@ public class Cittadini {
 		cittadino.indirizzo_email = Utili.leggiString("- Indirizzo e-mail > ").strip().replace(";", "");	// (opzionale) controllo se si tratta di una email
 		cittadino.user_id = Utili.leggiString("- User ID > ").strip().replace(";", "");
 		cittadino.password = sha256(Utili.leggiString("- Password > "));
-		cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "");
+		
+		while ((cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "").toUpperCase()).length() != 16)
+			System.out.println("Errore: L'ID di vaccinazione deve essere composto da 16 caratteri.");
 		
 		String riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
 				cittadino.nome,
@@ -205,6 +207,30 @@ public class Cittadini {
 		raf.writeBytes(riga);
 		
 		raf.close();
+	}
+	
+	// Trasforma l'ID di vaccinazione fornito come argomento nella riga dove esso risiede nel file Cittadini_Vaccinati.dati
+	// Esempio di ID Vaccinazione "AAAAAAAAAAAAAAFC" (sempre 16 caratteri ed ogni carattere può andare da 'A' a 'Z')
+	private static long fromIDToRiga(String id_vaccinazione) {
+		// Inizializzo la riga a 2 perché i vaccinati iniziano dalla riga 2. Se avessi per esempio l'ID
+		// "AAAAAAAAAAAAAAAA" (l'ID del primo vaccinato), questo varrebbe 0, quindi alla fine
+		// otterrei la riga 2, che è proprio quella del primo vaccinato.
+		long riga = 2;
+		
+		// Imposto i=6 in modo da fare 7 iterazioni (conto anche quella con i=0) e non tutte e 16 (lunghezza dell'ID)
+		// perché 26^15 sarebbe un numero troppo grande. Fermandomi a k=6 avrò k=[0,1,2,3,4,5,6] quindi considero
+		// le ultime 7 digit dell'ID vaccinazione: L'ID più grande che posso gestire è "ZZZZZZZ" che vale
+		// 26^6 * 25 + 26^5 * 25 + 26^4 * 25 + 26^3 * 25 + 26^2 * 25 + 26^1 * 25 + 26^0 * 25 = 8'031'810'175 = (26^7)-1
+		// "      Z           Z           Z           Z           Z           Z           Z  "
+		// il che significa che possiamo gestire 8'031'810'176 utenti.
+		for (int i = 6, k = 0; i >= 0; i--, k++) {
+			// Il carattere 'A' avrà peso 0 nel conto della riga. Siccome 'A' in ASCII equivale a 65, sottraggo la
+			// stessa quantità per ottenere 0. 'B' a questo punto varrà 1, 'C' varrà 2, ...
+			int char_to_number = id_vaccinazione.charAt(i)-65;
+			riga += (26^k)*char_to_number;
+		}
+		
+		return riga;
 	}
 	
 	public static String sha256(String base) {
@@ -232,7 +258,7 @@ public class Cittadini {
 		// Può essere invocato solo dopo aver effettuato il login;
 		
 		String choice = "";
-		int check = -1;	// Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal complatore;
+		int check = -1;	// Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal compilatore;
 		int severita[] = new int[6];
 		String note[] = new String[6];
 		
