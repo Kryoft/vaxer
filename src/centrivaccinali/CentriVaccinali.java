@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import cittadini.Cittadini;
+import menu.MainMenu;
 import menu.Utili;
 
 public class CentriVaccinali {
@@ -36,9 +37,8 @@ public class CentriVaccinali {
 		
 		// Controlla se il file CentriVaccinali.dati esiste già oppure no.
 		// Nel caso non esistesse inserisce i nomi dei campi, ...
-		String file_path = "data/CentriVaccinali.dati";
-		if (!Files.exists(Paths.get(file_path)))
-			Utili.scriviSuFile(file_path, true, "NOME;INDIRIZZO;TIPOLOGIA" + Utili.NEW_LINE);
+		if (!Files.exists(Paths.get(MainMenu.CENTRI_VACCINALI_PATH)))
+			Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true, "NOME;INDIRIZZO;TIPOLOGIA" + Utili.NEW_LINE);
 		// ...nel caso non esistesse controlla se esiste già un centro con quel nome.
 		else {
 			ArrayList<String> centri = Cittadini.cercaCentroVaccinale(centro.nome_centro);
@@ -64,7 +64,7 @@ public class CentriVaccinali {
 		System.out.println();
 		
 		// Scrive sul file CentriVaccinali.dati il nuovo centro vaccinale;
-		Utili.scriviSuFile("data/CentriVaccinali.dati", true,
+		Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true,
 							String.format("%s;%s;%s%s",
 									centro.nome_centro,
 									centro.indirizzo.toString(),
@@ -108,7 +108,7 @@ public class CentriVaccinali {
 		
 		String nome_vaccino = Utili.leggiString("    6. Nome del Vaccino > ").strip().replace(";", "");
 		
-		String file_path = "data/Cittadini_Vaccinati.dati";
+		String file_path = MainMenu.CITTADINI_VACCINATI_PATH;
 		String nuovo_id_vaccinazione;
 		String ultima_riga = Utili.leggiUltimaRiga(file_path);
 		if (ultima_riga == null) {

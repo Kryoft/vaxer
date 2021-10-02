@@ -10,20 +10,29 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import menu.MainMenu;
 import menu.Utili;
 
 public class Cittadini {
 	
-	String nome;
-	String cognome;
-	String codice_fiscale;
-	String indirizzo_email;
-	String user_id;
-	String password;
-	String id_vaccinazione;
+	private String nome;
+	private String cognome;
+	private String codice_fiscale;
+	private String indirizzo_email;
+	private String user_id;
+	private String password;
+	private String id_vaccinazione;
+	
+	static Map<String, Integer> cittadini_registrati = new HashMap<>();
+	static int numero_righe_file_cittadini_registrati = 0;
+	private static boolean logged_in;
 	
 	public static ArrayList<String> scegliCriterioRicerca() throws IOException {
 		while (true) {
@@ -56,7 +65,7 @@ public class Cittadini {
 	
 	public static ArrayList<String> cercaCentroVaccinale(String nome_centro) throws IOException {
 		// Cercare i centri il cui nome contiene la stringa passata come argomento nel file CentriVaccinali.dati;
-		BufferedReader br = new BufferedReader(new FileReader("data/CentriVaccinali.dati"));
+		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
 		ArrayList<String> centri_trovati = new ArrayList<>();
 		String str;
 		String centro;
@@ -79,7 +88,7 @@ public class Cittadini {
 	
 	public static ArrayList<String> cercaCentroVaccinale(String comune, String tipologia) throws IOException {
 		// Cercare i centri il cui comune e tipologia corrispondono ai dati passati come argomento nel file CentriVaccinali.dati;
-		BufferedReader br = new BufferedReader(new FileReader("data/CentriVaccinali.dati"));
+		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
 		ArrayList<String> centri_trovati = new ArrayList<>();
 		String str;
 		String[] address = null;
@@ -166,6 +175,26 @@ public class Cittadini {
 		return scelta;  // if (scelta == 0) then l'utente vuole annullare la selezione
 	}
 	
+	public static boolean caricaCittadiniRegistrati() throws IOException {
+		if (!Files.exists(Paths.get(MainMenu.CITTADINI_REGISTRATI_PATH)))
+			return false;
+		
+		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CITTADINI_REGISTRATI_PATH));
+		String s;
+		
+		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
+		
+		numero_righe_file_cittadini_registrati = 1;
+		while ((s = br.readLine()) != null) {
+			// memorizzo la coppia "user_ID, riga" perché memorizzare la password
+			// direttamente avrebbe un gran peso sulla memoria RAM.
+			cittadini_registrati.put(s.substring(0, s.indexOf(';')), ++numero_righe_file_cittadini_registrati);
+		}
+		
+		br.close();
+		return true;
+	}
+	
 	public static void registraCittadino() throws IOException {
 		/*
 		 * Inserisce i campi dell'oggetto che invoca la funzione nel file Cittadini_Registrati.dati
@@ -176,7 +205,7 @@ public class Cittadini {
 		// i bytes già scritti in una certa posizione (si istanzia un RandomAccessFile in "rw" mode e si fa seek(long pos)
 		// per spostarsi di 'pos' bytes nel file; successivamente si possono utilizzare i metodi write, come per esempio
 		// writeBytes(String s) per MODIFICARE i byte successivi a 'pos' con quelli specificati come argomento).
-		RandomAccessFile raf = new RandomAccessFile("data/Cittadini_Registrati.dati", "rw");
+		RandomAccessFile raf = new RandomAccessFile(MainMenu.CITTADINI_REGISTRATI_PATH, "rw");
 		
 		if (raf.length() == 0)
 			raf.writeBytes("NOME;COGNOME;CODICE_FISCALE;EMAIL;USER_ID;PASSWORD;ID_VACCINAZIONE" + Utili.NEW_LINE);
@@ -194,17 +223,19 @@ public class Cittadini {
 			System.out.println("Errore: L'ID di vaccinazione deve essere composto da 16 caratteri.");
 		
 		String riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
+				cittadino.user_id,
 				cittadino.nome,
 				cittadino.cognome,
 				cittadino.codice_fiscale,
 				cittadino.indirizzo_email,
-				cittadino.user_id,
 				cittadino.password,
 				cittadino.id_vaccinazione,
 				Utili.NEW_LINE);
 		
 		raf.seek(raf.length());  // imposta la posizione del puntatore del RAF alla fine del file
 		raf.writeBytes(riga);
+		
+		cittadini_registrati.put(cittadino.user_id, ++numero_righe_file_cittadini_registrati);
 		
 		raf.close();
 	}
@@ -252,10 +283,10 @@ public class Cittadini {
 	    }
 	}
 	
-	// Metodo LOGIN da fare quando si avrà un'idea più precisa;
-	
 	public static void inserisciEventiAvversi() throws IOException {
 		// Può essere invocato solo dopo aver effettuato il login;
+		if (!logged_in && !login())
+			return;
 		
 		String choice = "";
 		int check = -1;	// Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal compilatore;
@@ -308,10 +339,48 @@ public class Cittadini {
 		
 	}
 	
+	private static boolean login() throws IOException {
+		Integer riga;
+		String user_ID;
+		String password;
+		
+		System.out.println(Utili.NEW_LINE + "- LOGIN -");
+		
+		do {
+			user_ID = Utili.leggiString("- UserID > ");
+		} while ((riga = cittadini_registrati.get(user_ID)) == null && Utili.leggiSiNo(Utili.NEW_LINE +
+													"L'UserID non esiste. Riprovare?"));
+		
+		password = getPassword(MainMenu.CITTADINI_REGISTRATI_PATH, riga);
+		
+		if (password != null) {
+			do {
+				logged_in = (password.equals(sha256(Utili.leggiString("- Password > ")))) ? true : false;
+			} while (!logged_in && Utili.leggiSiNo(Utili.NEW_LINE +
+														"Password errata. Riprovare?"));
+		}
+		
+		if (logged_in)
+			System.out.println("Login eseguito.");
+		return logged_in;
+	}
+	
+	private static String getPassword(String file_path, int riga) throws IOException {
+		String password_nel_file = Utili.leggiRiga(file_path, riga);
+		
+		if (password_nel_file != null) {
+			password_nel_file = password_nel_file.split(";")[5];
+		}
+		
+		return password_nel_file;
+	}
+	
 	public static void main(String[] args) throws IOException {
 		
 		String choice;
 		boolean exit = false;
+		
+		caricaCittadiniRegistrati();
 		
 		do {
 			System.out.println("- Menu Cittadini -");

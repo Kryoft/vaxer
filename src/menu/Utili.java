@@ -8,6 +8,7 @@ package menu;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -70,6 +71,21 @@ public abstract class Utili {
 				break;
 			}
 		}
+	}
+	
+	public static String leggiRiga(String file_path, int riga) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(file_path));
+		String s = null;
+		
+		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
+		
+		int riga_da_leggere = 2;
+		while (riga_da_leggere++ < riga && br.readLine() != null) {}
+		
+		s = br.readLine();
+		
+		br.close();
+		return s;
 	}
 	
 	// Questo metodo permette di leggere l'ultima riga di un file senza
