@@ -79,7 +79,7 @@ public class CentriVaccinali {
 	public static boolean registraVaccinato() throws IOException {
 		/* 
 		 * Campi per il file Cittadini_Vaccinati:
-		 * NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI
+		 * ID_VACCINAZIONE;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI
 		 * Esempio di severità e note opzionali:
 		 * [...];4, 0, 0, 0, 0, 0;mi fa male la testa, *, *, *, *, *
 		 */
@@ -98,7 +98,7 @@ public class CentriVaccinali {
 		Date data_vaccinazione;
 		while (true) {
 			try {
-				data_vaccinazione = sdf.parse(Utili.leggiString("    5. Data della Vaccinazione ('giorno/mese/anno' es. 15/03/21):"));
+				data_vaccinazione = sdf.parse(Utili.leggiString("    5. Data della Vaccinazione ('giorno/mese/anno' es. 15/03/2021):"));
 				break;
 			} catch (ParseException e) {
 				System.out.println("Data non valida.");
@@ -114,22 +114,24 @@ public class CentriVaccinali {
 		if (ultima_riga == null) {
 			nuovo_id_vaccinazione = "AAAAAAAAAAAAAAAA";
 		} else {
-			nuovo_id_vaccinazione = ultima_riga.split(";")[6];
+			nuovo_id_vaccinazione = ultima_riga.substring(0, ultima_riga.indexOf(';'));
 			nuovo_id_vaccinazione = generaId(nuovo_id_vaccinazione);
 		}
 		
 		if (!Files.exists(Paths.get(file_path)))
-			Utili.scriviSuFile(file_path, true, "NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;ID_VACCINAZIONE;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI" + Utili.NEW_LINE);
+			Utili.scriviSuFile(file_path, true, "ID_VACCINAZIONE;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI" + Utili.NEW_LINE);
 		
 		Utili.scriviSuFile(file_path, true, String.format("%s;%s;%s;%s;%s;%s;%s;;%s",
+				nuovo_id_vaccinazione,
 				nome_cittadino,
 				cognome_cittadino,
 				codice_fiscale,
 				nome_centro,
 				data_vacc,
 				nome_vaccino,
-				nuovo_id_vaccinazione,
 				Utili.NEW_LINE));
+		
+		Cittadini.cittadini_vaccinati.put(nuovo_id_vaccinazione, ++Cittadini.numero_righe_file_cittadini_vaccinati);
 		
 		return true;
 	}
@@ -196,6 +198,12 @@ public class CentriVaccinali {
 		
 		String choice;
 		boolean exit = false;
+		
+		if (Cittadini.cittadini_vaccinati.isEmpty()) {
+			System.out.println("Caricamento Cittadini Vaccinati...");
+			Cittadini.caricaCittadiniVaccinati();
+			System.out.println("Caricamento Completato." + Utili.NEW_LINE);
+		}
 		
 		do {
 			System.out.println("- Menu Centri Vaccinali -");

@@ -22,6 +22,14 @@ import menu.Utili;
 
 public class Cittadini {
 	
+	// memorizzo la coppia "ID_vaccinazione, riga" così da poter ottenere subito la riga cui un cittadino è scritto dato il suo ID di vaccinazione
+	public static Map<String, Long> cittadini_vaccinati = new HashMap<>();
+	public static long numero_righe_file_cittadini_vaccinati = 0;
+	// memorizzo la coppia "user_ID, riga" perché memorizzare "user_ID, password" direttamente avrebbe un gran peso sulla memoria RAM (la password è sempre di 64 caratteri).
+	public static Map<String, Long> cittadini_registrati = new HashMap<>();
+	public static long numero_righe_file_cittadini_registrati = 0;
+	private static String login_userID;
+	
 	private String nome;
 	private String cognome;
 	private String codice_fiscale;
@@ -29,10 +37,6 @@ public class Cittadini {
 	private String user_id;
 	private String password;
 	private String id_vaccinazione;
-	
-	static Map<String, Integer> cittadini_registrati = new HashMap<>();
-	static int numero_righe_file_cittadini_registrati = 0;
-	private static boolean logged_in;
 	
 	public static ArrayList<String> scegliCriterioRicerca() throws IOException {
 		while (true) {
@@ -175,20 +179,45 @@ public class Cittadini {
 		return scelta;  // if (scelta == 0) then l'utente vuole annullare la selezione
 	}
 	
+	public static boolean caricaCittadiniVaccinati() throws IOException {
+		if (!Files.exists(Paths.get(MainMenu.CITTADINI_VACCINATI_PATH)))
+			return false;
+		
+		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CITTADINI_VACCINATI_PATH));
+		String s;
+		
+		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
+		
+		numero_righe_file_cittadini_vaccinati = 1;
+		while ((s = br.readLine()) != null) {
+			cittadini_vaccinati.put(s.substring(0, s.indexOf(';')), ++numero_righe_file_cittadini_vaccinati);
+		}
+		
+		br.close();
+		return true;
+	}
+	
 	public static boolean caricaCittadiniRegistrati() throws IOException {
 		if (!Files.exists(Paths.get(MainMenu.CITTADINI_REGISTRATI_PATH)))
 			return false;
 		
 		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CITTADINI_REGISTRATI_PATH));
 		String s;
+		String ID;
 		
 		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
 		
 		numero_righe_file_cittadini_registrati = 1;
 		while ((s = br.readLine()) != null) {
-			// memorizzo la coppia "user_ID, riga" perché memorizzare la password
-			// direttamente avrebbe un gran peso sulla memoria RAM.
 			cittadini_registrati.put(s.substring(0, s.indexOf(';')), ++numero_righe_file_cittadini_registrati);
+			ID = s.substring(s.lastIndexOf(';')+1);
+			// Una volta ottenuto l'ID da una riga generica del file Cittadini_Registrati.dati, sono sicuro che
+			// tale ID sia anche in 'cittadini_vaccinati', perché solo i cittadini vaccinati possono aver eseguito
+			// la registrazione. Per quegli ID imposto la riga associata in 'cittadini_vaccinati' negativa, in modo
+			// che quando trovo un ID con riga negativa so che è già registrato e non permetto una nuova registrazione
+			// con quell'ID. Inoltre, l'informazione riga rimane comunque, è solo negativa, quindi posso sapere a quale
+			// riga è scritto il cittadino con quell'ID nel file Cittadini_Vaccinati.dati
+			cittadini_vaccinati.replace(ID, -cittadini_vaccinati.get(ID));
 		}
 		
 		br.close();
@@ -208,7 +237,7 @@ public class Cittadini {
 		RandomAccessFile raf = new RandomAccessFile(MainMenu.CITTADINI_REGISTRATI_PATH, "rw");
 		
 		if (raf.length() == 0)
-			raf.writeBytes("NOME;COGNOME;CODICE_FISCALE;EMAIL;USER_ID;PASSWORD;ID_VACCINAZIONE" + Utili.NEW_LINE);
+			raf.writeBytes("USER_ID;NOME;COGNOME;CODICE_FISCALE;EMAIL;PASSWORD;ID_VACCINAZIONE" + Utili.NEW_LINE);
 		
 		Cittadini cittadino = new Cittadini();
 		
@@ -219,10 +248,37 @@ public class Cittadini {
 		cittadino.user_id = Utili.leggiString("- User ID > ").strip().replace(";", "");
 		cittadino.password = sha256(Utili.leggiString("- Password > "));
 		
-		while ((cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "").toUpperCase()).length() != 16)
-			System.out.println("Errore: L'ID di vaccinazione deve essere composto da 16 caratteri.");
+		Long num_riga = null;
+		while (num_riga == null || num_riga < 0) {
+			while ((cittadino.id_vaccinazione = Utili.leggiString("- ID Vaccinazione > ").strip().replace(";", "").toUpperCase()).length() != 16) {
+				if (!Utili.leggiSiNo("Errore: L'ID di vaccinazione deve essere composto da 16 caratteri alfanumerici. Riprovare?")) {
+					raf.close();
+					return;
+				}
+			}
+			
+			num_riga = cittadini_vaccinati.get(cittadino.id_vaccinazione);
+			
+			if (num_riga == null)  // se la riga che corrisponde all'ID inserito non è nulla, allora esiste un cittadino con quell'ID
+				if (Utili.leggiSiNo("Errore: L'ID inserito non corrisponde a nessun cittadino vaccinato. Riprovare?"))
+					continue;
+				else {
+					raf.close();
+					return;
+				}
+			else if (num_riga < 0) {
+				if (Utili.leggiSiNo("Errore: L'ID inserito corrisponde ad un utente già registrato. Riprovare?"))
+					continue;
+				else {
+					raf.close();
+					return;
+				}
+			}
+		}
 		
-		String riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
+		String riga = Utili.leggiRiga(MainMenu.CITTADINI_VACCINATI_PATH, num_riga);
+		
+		riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
 				cittadino.user_id,
 				cittadino.nome,
 				cittadino.cognome,
@@ -236,32 +292,9 @@ public class Cittadini {
 		raf.writeBytes(riga);
 		
 		cittadini_registrati.put(cittadino.user_id, ++numero_righe_file_cittadini_registrati);
+		cittadini_vaccinati.replace(cittadino.id_vaccinazione, -cittadini_vaccinati.get(cittadino.id_vaccinazione));
 		
 		raf.close();
-	}
-	
-	// Trasforma l'ID di vaccinazione fornito come argomento nella riga dove esso risiede nel file Cittadini_Vaccinati.dati
-	// Esempio di ID Vaccinazione "AAAAAAAAAAAAAAFC" (sempre 16 caratteri ed ogni carattere può andare da 'A' a 'Z')
-	private static long fromIDToRiga(String id_vaccinazione) {
-		// Inizializzo la riga a 2 perché i vaccinati iniziano dalla riga 2. Se avessi per esempio l'ID
-		// "AAAAAAAAAAAAAAAA" (l'ID del primo vaccinato), questo varrebbe 0, quindi alla fine
-		// otterrei la riga 2, che è proprio quella del primo vaccinato.
-		long riga = 2;
-		
-		// Imposto i=6 in modo da fare 7 iterazioni (conto anche quella con i=0) e non tutte e 16 (lunghezza dell'ID)
-		// perché 26^15 sarebbe un numero troppo grande. Fermandomi a k=6 avrò k=[0,1,2,3,4,5,6] quindi considero
-		// le ultime 7 digit dell'ID vaccinazione: L'ID più grande che posso gestire è "ZZZZZZZ" che vale
-		// 26^6 * 25 + 26^5 * 25 + 26^4 * 25 + 26^3 * 25 + 26^2 * 25 + 26^1 * 25 + 26^0 * 25 = 8'031'810'175 = (26^7)-1
-		// "      Z           Z           Z           Z           Z           Z           Z  "
-		// il che significa che possiamo gestire 8'031'810'176 utenti.
-		for (int i = 6, k = 0; i >= 0; i--, k++) {
-			// Il carattere 'A' avrà peso 0 nel conto della riga. Siccome 'A' in ASCII equivale a 65, sottraggo la
-			// stessa quantità per ottenere 0. 'B' a questo punto varrà 1, 'C' varrà 2, ...
-			int char_to_number = id_vaccinazione.charAt(i)-65;
-			riga += (26^k)*char_to_number;
-		}
-		
-		return riga;
 	}
 	
 	public static String sha256(String base) {
@@ -283,9 +316,9 @@ public class Cittadini {
 	    }
 	}
 	
+	// Può essere invocato solo dopo aver effettuato il login;
 	public static void inserisciEventiAvversi() throws IOException {
-		// Può essere invocato solo dopo aver effettuato il login;
-		if (!logged_in && !login())
+		if (login_userID == null && !login())
 			return;
 		
 		String choice = "";
@@ -340,18 +373,20 @@ public class Cittadini {
 	}
 	
 	private static boolean login() throws IOException {
-		Integer riga;
+		boolean logged_in = false;
+		Long riga;
 		String user_ID;
-		String password;
+		String password = null;
 		
 		System.out.println(Utili.NEW_LINE + "- LOGIN -");
 		
 		do {
 			user_ID = Utili.leggiString("- UserID > ");
 		} while ((riga = cittadini_registrati.get(user_ID)) == null && Utili.leggiSiNo(Utili.NEW_LINE +
-													"L'UserID non esiste. Riprovare?"));
+																		"L'UserID non esiste. Riprovare?"));
 		
-		password = getPassword(MainMenu.CITTADINI_REGISTRATI_PATH, riga);
+		if (riga != null)
+			password = getPassword(MainMenu.CITTADINI_REGISTRATI_PATH, riga);
 		
 		if (password != null) {
 			do {
@@ -360,12 +395,14 @@ public class Cittadini {
 														"Password errata. Riprovare?"));
 		}
 		
-		if (logged_in)
+		if (logged_in) {
+			login_userID = user_ID;
 			System.out.println("Login eseguito.");
+		}
 		return logged_in;
 	}
 	
-	private static String getPassword(String file_path, int riga) throws IOException {
+	private static String getPassword(String file_path, long riga) throws IOException {
 		String password_nel_file = Utili.leggiRiga(file_path, riga);
 		
 		if (password_nel_file != null) {
@@ -380,15 +417,29 @@ public class Cittadini {
 		String choice;
 		boolean exit = false;
 		
-		caricaCittadiniRegistrati();
-		
 		do {
 			System.out.println("- Menu Cittadini -");
+			
+			if (cittadini_vaccinati.isEmpty()) {
+				System.out.println("Caricamento Cittadini Vaccinati...");
+				caricaCittadiniVaccinati();
+				System.out.println("Caricamento Completato." + Utili.NEW_LINE);
+			}
+			if (cittadini_registrati.isEmpty()) {
+				System.out.println("Caricamento Cittadini Registrati...");
+				caricaCittadiniRegistrati();
+				System.out.println("Caricamento completato." + Utili.NEW_LINE);
+			}
+			if (login_userID != null)
+				System.out.println("[Utente corrente: " + login_userID + "]");
+			
 			System.out.println("Quale operazione vuoi eseguire?" + Utili.NEW_LINE);
 			System.out.println("1) Registrati");
 			System.out.println("2) Cerca un centro vaccinale");
 			System.out.println("3) Visualizza informazioni centro vaccinale");
 			System.out.println("4) Segnala eventi avversi post-vaccinazione");
+			if (login_userID != null)
+				System.out.println("5) Logout");
 			System.out.println("0) Menu Principale");
 			
 			choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
@@ -398,6 +449,7 @@ public class Cittadini {
 					break;
 				case "1":
 					registraCittadino();
+					System.out.println();
 					break;
 				case "2":
 					ArrayList<String> centri_trovati = scegliCriterioRicerca();
@@ -411,6 +463,12 @@ public class Cittadini {
 				case "4":
 					inserisciEventiAvversi();
 					System.out.println();
+					break;
+				case "5":
+					if (login_userID != null) {
+						login_userID = null;
+						System.out.println("[Utente disconnesso]");
+					}
 					break;
 				default:
 					System.out.println("Scelta non valida, riprova.");

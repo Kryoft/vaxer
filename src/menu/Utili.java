@@ -73,7 +73,10 @@ public abstract class Utili {
 		}
 	}
 	
-	public static String leggiRiga(String file_path, int riga) throws IOException {
+	public static String leggiRiga(String file_path, long riga) throws IOException {
+		if (!Files.exists(Paths.get(file_path)))
+			return null;
+		
 		BufferedReader br = new BufferedReader(new FileReader(file_path));
 		String s = null;
 		
