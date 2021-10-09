@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import cittadini.Cittadini;
 import menu.MainMenu;
@@ -28,6 +29,7 @@ public class CentriVaccinali {
 	 * Costruttore rimosso perchè si andranno a modificare i campi una volta creato l'oggetto, come per le altre classi.
 	 */
 	
+	// Lista principali centri vaccinali in Italia : https://www.governo.it/it/cscovid19/report-vaccini/
 	public static CentriVaccinali registraCentroVaccinale() throws IOException {
 		// Inizializza un oggetto "CentriVaccinali" e successivamente richiede le informazioni necessarie all'utente;
 		CentriVaccinali centro = new CentriVaccinali();
@@ -36,10 +38,10 @@ public class CentriVaccinali {
 		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip().replace(";", "");
 		
 		// Controlla se il file CentriVaccinali.dati esiste già oppure no.
-		// Nel caso non esistesse inserisce i nomi dei campi, ...
+		// Nel caso non esistesse lo creerebbe ed inserirebbe i nomi dei campi, ...
 		if (!Files.exists(Paths.get(MainMenu.CENTRI_VACCINALI_PATH)))
-			Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true, "NOME;INDIRIZZO;TIPOLOGIA" + Utili.NEW_LINE);
-		// ...nel caso non esistesse controlla se esiste già un centro con quel nome.
+			Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true, "NOME;INDIRIZZO;TIPOLOGIA;SEVERITA_MEDIA;NUMERO_SEGNALAZIONI" + Utili.NEW_LINE);
+		// ...nel caso invece esistesse controllerebbe se esiste già un centro con quel nome.
 		else {
 			ArrayList<String> centri = Cittadini.cercaCentroVaccinale(centro.nome_centro);
 			for (String centro_vaccinale : centri)
@@ -65,7 +67,7 @@ public class CentriVaccinali {
 		
 		// Scrive sul file CentriVaccinali.dati il nuovo centro vaccinale;
 		Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true,
-							String.format("%s;%s;%s%s",
+							String.format("%s;%s;%s;;%s",
 									centro.nome_centro,
 									centro.indirizzo.toString(),
 									centro.tipologia,
@@ -109,19 +111,21 @@ public class CentriVaccinali {
 		String nome_vaccino = Utili.leggiString("    6. Nome del Vaccino > ").strip().replace(";", "");
 		
 		String file_path = MainMenu.CITTADINI_VACCINATI_PATH;
-		String nuovo_id_vaccinazione;
-		String ultima_riga = Utili.leggiUltimaRiga(file_path);
-		if (ultima_riga == null) {
-			nuovo_id_vaccinazione = "AAAAAAAAAAAAAAAA";
-		} else {
-			nuovo_id_vaccinazione = ultima_riga.substring(0, ultima_riga.indexOf(';'));
-			nuovo_id_vaccinazione = generaId(nuovo_id_vaccinazione);
-		}
+		
+//		String ultima_riga = Utili.leggiUltimaRiga(file_path);
+//		if (ultima_riga == null) {
+//			nuovo_id_vaccinazione = "AAAAAAAAAAAAAAAA";
+//		} else {
+//			nuovo_id_vaccinazione = ultima_riga.substring(0, ultima_riga.indexOf(';'));
+//			nuovo_id_vaccinazione = generaId(nuovo_id_vaccinazione);
+//		}
+		
+		String nuovo_id_vaccinazione = generaNuovoId();
 		
 		if (!Files.exists(Paths.get(file_path)))
 			Utili.scriviSuFile(file_path, true, "ID_VACCINAZIONE;NOME_CITTADINO;COGNOME_CITTADINO;CODICE_FISCALE;NOME_CENTRO_VACCINALE;DATA_SOMMINISTRAZIONE_VACCINO;VACCINO_SOMMINISTRATO;EVENTI_AVVERSI_E_SEVERITA;NOTE_OPZIONALI" + Utili.NEW_LINE);
 		
-		Utili.scriviSuFile(file_path, true, String.format("%s;%s;%s;%s;%s;%s;%s;;%s",
+		Utili.scriviSuFile(file_path, true, String.format("%s;%s;%s;%s;%s;%s;%s;0,0,0,0,0,0;#|#|#|#|#|#%s",
 				nuovo_id_vaccinazione,
 				nome_cittadino,
 				cognome_cittadino,
@@ -165,27 +169,46 @@ public class CentriVaccinali {
 		return nome_centro;
 	}
 	
-	private static String generaId(String ultimo_codice) {
-		char[] nuovo_codice = ultimo_codice.toCharArray();
-		// Siccome in Java le stringhe sono immutabili, ogni volta che viene eseguita un'operazione di
-		// concatenazione o modifica di una stringa ne viene creata un'altra che prende il posto di quella
-		// vecchia, che verrà presto eliminata dal Garbage Collector. La classe StringBuilder è stata
-		// creata appositamente per costruire una stringa evitando questo
-		StringBuilder nuovo_codice_str = new StringBuilder();
+//	private static String generaId(String ultimo_codice) {
+//		char[] nuovo_codice = ultimo_codice.toCharArray();
+//		// Siccome in Java le stringhe sono immutabili, ogni volta che viene eseguita un'operazione di
+//		// concatenazione o modifica di una stringa ne viene creata un'altra che prende il posto di quella
+//		// vecchia, che verrà presto eliminata dal Garbage Collector. La classe StringBuilder è stata
+//		// creata appositamente per costruire una stringa evitando questo
+//		StringBuilder nuovo_codice_str = new StringBuilder();
+//		
+//		nuovo_codice[nuovo_codice.length-1]++;
+//		for (int i = nuovo_codice.length-1; i >= 0; i--) {
+//			if (nuovo_codice[i] == 'Z'+1) {
+//				nuovo_codice[i] = 'A';
+//				nuovo_codice[i-1]++;
+//			}
+//			// Siccome il for va al contrario, appendo alla stringa il carattere in posizione i...
+//			nuovo_codice_str.append(nuovo_codice[i]);
+//		}
+//		
+//		// ... poi la inverto
+//		nuovo_codice_str.reverse();
+//		return nuovo_codice_str.toString();
+//	}
+	
+	private static String generaNuovoId() {
+		StringBuilder nuovo_codice = new StringBuilder();
+		String codice;
+		Random random = new Random();
 		
-		nuovo_codice[nuovo_codice.length-1]++;
-		for (int i = nuovo_codice.length-1; i >= 0; i--) {
-			if (nuovo_codice[i] == 'Z'+1) {
-				nuovo_codice[i] = 'A';
-				nuovo_codice[i-1]++;
+		do {
+			for (int i = 0; i < 16; i++) {
+				if (random.nextBoolean())
+					nuovo_codice.append((char) (random.nextInt(10)+48));  // I numeri da 0 a 9 in ASCII risiedono nelle posizioni da 48 a 57
+				else
+					nuovo_codice.append((char) (random.nextInt(26)+65));  // Le lettere maiuscole in ASCII risiedono nelle posizioni da 65 a 90
 			}
-			// Siccome il for va al contrario, appendo alla stringa il carattere in posizione i...
-			nuovo_codice_str.append(nuovo_codice[i]);
-		}
+			codice = nuovo_codice.toString();
+			nuovo_codice.delete(0, nuovo_codice.length());
+		} while (Cittadini.cittadini_vaccinati.containsKey(codice));  // se l'ID è già presente nella HashMap, generane un altro
 		
-		// ... poi la inverto
-		nuovo_codice_str.reverse();
-		return nuovo_codice_str.toString();
+		return codice;
 	}
 	
 	@Override

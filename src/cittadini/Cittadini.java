@@ -7,7 +7,10 @@
 package cittadini;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -28,7 +31,14 @@ public class Cittadini {
 	// memorizzo la coppia "user_ID, riga" perché memorizzare "user_ID, password" direttamente avrebbe un gran peso sulla memoria RAM (la password è sempre di 64 caratteri).
 	public static Map<String, Long> cittadini_registrati = new HashMap<>();
 	public static long numero_righe_file_cittadini_registrati = 0;
-	private static String login_userID;
+	private static String logged_userID;
+	private static String logged_ID;
+	private static final String[] eventi_avversi = {"Mal di testa",
+													"Febbre",
+													"Dolori muscolari e articolari",
+													"Linfoadenopatia",
+													"Tachicardia",
+													"Crisi ipertensiva"};
 	
 	private String nome;
 	private String cognome;
@@ -317,9 +327,9 @@ public class Cittadini {
 	}
 	
 	// Può essere invocato solo dopo aver effettuato il login;
-	public static void inserisciEventiAvversi() throws IOException {
-		if (login_userID == null && !login())
-			return;
+	public static boolean inserisciEventiAvversi() throws IOException {
+		if (logged_userID == null && !login())
+			return false;
 		
 		String choice = "";
 		int check = -1;	// Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal compilatore;
@@ -332,12 +342,12 @@ public class Cittadini {
 			do {
 				System.out.println(Utili.NEW_LINE + "- Segnalazione Eventi Avversi - " + Utili.NEW_LINE);
 				System.out.println("Selezionare il sintomo riscontrato" + Utili.NEW_LINE);
-				System.out.println("1) Mal di testa");
-				System.out.println("2) Febbre");
-				System.out.println("3) Dolori muscolari e articolari");
-				System.out.println("4) Linfoadenopatia");
-				System.out.println("5) Tachicardia");
-				System.out.println("6) Crisi ipertensiva");
+				System.out.println("1) " + eventi_avversi[0]);
+				System.out.println("2) " + eventi_avversi[1]);
+				System.out.println("3) " + eventi_avversi[2]);
+				System.out.println("4) " + eventi_avversi[3]);
+				System.out.println("5) " + eventi_avversi[4]);
+				System.out.println("6) " + eventi_avversi[5]);
 				System.out.println("0) Termina");
 				
 				try {
@@ -346,11 +356,11 @@ public class Cittadini {
 				} catch(NumberFormatException e) {
 					System.out.println(Utili.NEW_LINE + "ERRORE: risposta non valida");
 				}
-			} while(check < 0 || check >= 6);
+			} while(check < 0 || check > 6);
 			
 			if (!choice.equals("0")) {
 				sintomo_selezionato = Integer.parseInt(choice) - 1;	//Variabile utilizzata per identificare la posizione del sintomo nell'array severita;
-						
+				
 				do {
 					try {
 						severita[sintomo_selezionato] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.NEW_LINE + "> "));
@@ -358,25 +368,125 @@ public class Cittadini {
 						System.out.println(Utili.NEW_LINE + "ERRORE: risposta non valida");
 					}
 				} while (severita[sintomo_selezionato] < 1 || severita[sintomo_selezionato] > 5);
-						
+				
 				if (Utili.leggiSiNo("Desideri aggiungere una nota?")) {
 					do {
 						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.NEW_LINE + "> ");
+						note[sintomo_selezionato].replace("|", "");
 					} while (note[sintomo_selezionato].length() > 256);
-				}	
+				}
 			}
 			
 		} while(!choice.equals("0"));
 		
-		// MEMORIZZARE SU FILE I DATI NEGLI ARRAY severita[] E note[]
+		// Controlla se l'utente ha inserito severità oppure no. Se tutti i valori nell'array severita sono a 0,
+		// il cittadino non avrà inserito niente, perciò termino.
+		boolean ha_inserito_valori = false;
+		for (int val : severita)
+			if (val != 0) {
+				ha_inserito_valori = true;
+				break;
+			}
+		if (!ha_inserito_valori)
+			return false;
 		
+		// TODO: MEMORIZZARE SU FILE I DATI NEGLI ARRAY severita[] E note[]
+		
+		long riga_cittadino_su_file_vaccinati = cittadini_vaccinati.get(logged_ID);
+		if (riga_cittadino_su_file_vaccinati < 0)
+			riga_cittadino_su_file_vaccinati = -riga_cittadino_su_file_vaccinati;
+		memorizzaEventiAvversi(severita, note, riga_cittadino_su_file_vaccinati);
+		
+		// ...
+		
+		return true;
+	}
+	
+	private static void memorizzaEventiAvversi(int[] severita, String[] note_opzionali, long riga) throws IOException {
+		// Se sono arrivato a questo punto, so già che ho da scrivere dei dati, quindi posso iniziare a copiare
+		// nel file temporaneo dei Cittadini_Vaccinati le righe che precedono la riga del cittadino loggato correntemente.
+		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CITTADINI_VACCINATI_PATH));
+		String temp_file_path = "data/Cittadini_Vaccinati_temp.dati";
+		BufferedWriter bw = new BufferedWriter(new FileWriter(temp_file_path));
+		
+		long contatore_riga = 1;
+		// non ho bisogno di controllare che br.readLine sia null perché sto cercando una riga che c'è sicuramente
+		while (contatore_riga++ < riga) {
+			bw.write(br.readLine() + Utili.NEW_LINE);
+		}
+		
+		String line = br.readLine();
+		String[] dati = line.split(";");
+		StringBuilder nuova_riga = new StringBuilder();
+		
+		for (int i = 0; i < 7; i++)  // ricopio nella nuova_riga i primi 7 campi (da 0 a 6)
+			nuova_riga.append(dati[i] + ';');
+		
+		StringBuilder nuove_severita = new StringBuilder();
+		StringBuilder nuove_note_opzionali = new StringBuilder();
+		String[] note_sul_file = dati[8].split("\\|");  // https://stackoverflow.com/a/16311662
+			
+		// Loop per l'inserimento delle severità e delle note opzionali in nuova_riga
+		for (int i = 0; i < 11; i++) {
+			// dati[7] corrisponde al campo delle severità che sarà nel formato seguente: "0,3,0,2,0,0".
+			if (i % 2 != 0) {  // Se i è dispari appendo il divisore
+				nuove_severita.append(',');
+				nuove_note_opzionali.append('|');
+			} else {
+				if (severita[i/2] != 0) {  // se la severità corrente è != 0 significa che la voglio inserire...
+					if (dati[7].charAt(i) != '0')  // ...però se dati[7].charAt(i) != '0' allora è già presente una severità. Chiedo quindi all'utente se vuole sostituirla con quella appena inserita.
+						nuove_severita.append(Utili.leggiSiNo("Per l'evento avverso '" +
+																eventi_avversi[i/2] +
+																"' è già presente la severità " +
+																dati[7].charAt(i) +
+																". Desideri sostituirla con " +
+																severita[i/2] +
+																"?")? severita[i/2] : Character.toString(dati[7].charAt(i)));  // NB: è necessario convertire dati[7].charAt(i) in String perché altrimenti il metodo append converte il char nel numero relativo alla posizione di quel carattere nella tabella ASCII
+					else  // se invece dati[7].charAt(i) == '0' la sostituisco senza chiederlo all'utente.
+						nuove_severita.append(severita[i/2]);
+				} else {  // se invece la severità corrente è 0 significa che non la voglio inserire...
+					nuove_severita.append(Character.toString(dati[7].charAt(i)));  // ...quindi appendo quella già presente
+				}
+				
+				if (note_opzionali[i/2] != null) {  // se la nota_opzionale corrente è != null significa che la voglio inserire...
+					// ...però se !note_sul_file[i/2].equals(#) allora è già presente una nota. Chiedo quindi all'utente se vuole sostituirla con quella appena inserita.
+					if (!note_sul_file[i/2].equals("#"))
+						nuove_note_opzionali.append(Utili.leggiSiNo("Per la nota opzionale riguardante l'evento avverso '" +
+																	eventi_avversi[i/2] +
+																	"' è già presente la nota " +
+																	note_sul_file[i/2] +
+																	". Desideri sostituirla con " +
+																	note_opzionali[i/2] +
+																	"?")? note_opzionali[i/2] : note_sul_file[i/2]);
+					else  // se invece note_sul_file[i/2].equals("#") la sostituisco senza chiederlo all'utente.
+						nuove_note_opzionali.append(note_opzionali[i/2]);
+				} else {  // se invece la nota corrente è nulla significa che non la voglio inserire...
+					nuove_note_opzionali.append(note_sul_file[i/2]);  // ...quindi appendo quella già presente
+				}
+			}
+		}
+		nuova_riga.append(nuove_severita + ";" + nuove_note_opzionali);
+		
+		bw.write(nuova_riga.toString() + Utili.NEW_LINE);
+		
+		while ((line = br.readLine()) != null) {
+			bw.write(line + Utili.NEW_LINE);
+		}
+		
+		br.close();
+		bw.close();
+		
+		File to_delete = new File(MainMenu.CITTADINI_VACCINATI_PATH);
+		to_delete.delete();
+		File to_rename = new File("data/Cittadini_Vaccinati_temp.dati");
+		to_rename.renameTo(to_delete);
 	}
 	
 	private static boolean login() throws IOException {
 		boolean logged_in = false;
 		Long riga;
 		String user_ID;
-		String password = null;
+		String[] dati = null;
 		
 		System.out.println(Utili.NEW_LINE + "- LOGIN -");
 		
@@ -385,31 +495,23 @@ public class Cittadini {
 		} while ((riga = cittadini_registrati.get(user_ID)) == null && Utili.leggiSiNo(Utili.NEW_LINE +
 																		"L'UserID non esiste. Riprovare?"));
 		
-		if (riga != null)
-			password = getPassword(MainMenu.CITTADINI_REGISTRATI_PATH, riga);
+		if (riga != null) {
+			dati = Utili.leggiRiga(MainMenu.CITTADINI_REGISTRATI_PATH, riga).split(";");
+		}
 		
-		if (password != null) {
+		if (dati[5] != null) {
 			do {
-				logged_in = (password.equals(sha256(Utili.leggiString("- Password > ")))) ? true : false;
+				logged_in = (dati[5].equals(sha256(Utili.leggiString("- Password > ")))) ? true : false;
 			} while (!logged_in && Utili.leggiSiNo(Utili.NEW_LINE +
 														"Password errata. Riprovare?"));
 		}
 		
 		if (logged_in) {
-			login_userID = user_ID;
+			logged_userID = user_ID;
+			logged_ID = dati[6];
 			System.out.println("Login eseguito.");
 		}
 		return logged_in;
-	}
-	
-	private static String getPassword(String file_path, long riga) throws IOException {
-		String password_nel_file = Utili.leggiRiga(file_path, riga);
-		
-		if (password_nel_file != null) {
-			password_nel_file = password_nel_file.split(";")[5];
-		}
-		
-		return password_nel_file;
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -430,15 +532,15 @@ public class Cittadini {
 				caricaCittadiniRegistrati();
 				System.out.println("Caricamento completato." + Utili.NEW_LINE);
 			}
-			if (login_userID != null)
-				System.out.println("[Utente corrente: " + login_userID + "]");
+			if (logged_userID != null)
+				System.out.println("[Utente corrente: " + logged_userID + "]");
 			
 			System.out.println("Quale operazione vuoi eseguire?" + Utili.NEW_LINE);
 			System.out.println("1) Registrati");
 			System.out.println("2) Cerca un centro vaccinale");
 			System.out.println("3) Visualizza informazioni centro vaccinale");
 			System.out.println("4) Segnala eventi avversi post-vaccinazione");
-			if (login_userID != null)
+			if (logged_userID != null)
 				System.out.println("5) Logout");
 			System.out.println("0) Menu Principale");
 			
@@ -465,8 +567,8 @@ public class Cittadini {
 					System.out.println();
 					break;
 				case "5":
-					if (login_userID != null) {
-						login_userID = null;
+					if (logged_userID != null) {
+						logged_userID = null;
 						System.out.println("[Utente disconnesso]");
 					}
 					break;
