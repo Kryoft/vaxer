@@ -19,11 +19,15 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import menu.MainMenu;
 import menu.Utili;
 
 public class Cittadini {
+	
+	private static final String SEPARATORE_SEVERITA = ",";
+	private static final String SEPARATORE_NOTE_OPZIONALI = "|";
 	
 	// memorizzo la coppia "ID_vaccinazione, riga" così da poter ottenere subito la riga cui un cittadino è scritto dato il suo ID di vaccinazione
 	public static Map<String, Long> cittadini_vaccinati = new HashMap<>();
@@ -57,11 +61,11 @@ public class Cittadini {
 																	Utili.NEW_LINE,
 																	Utili.NEW_LINE));
 			
-			if (ricerca_per.equals("1")) {
+			if (ricerca_per.strip().equals("1")) {
 				System.out.println(Utili.NEW_LINE + "- Ricerca per Nome -");
 				String centro = Utili.leggiString("Nome Centro > ").strip();
 				return cercaCentroVaccinale(centro);
-			} else if (ricerca_per.equals("2")) {
+			} else if (ricerca_per.strip().equals("2")) {
 				System.out.println(Utili.NEW_LINE + "- Ricerca per Comune e Tipologia -");
 				String comune = Utili.leggiString("Comune del Centro > ").strip();
 				String tipologia = Utili.inserisciTipologiaCentro(String.format("- Tipologia:%s1) Ospedaliero%s2) Aziendale%s3) Hub%s%s> ",
@@ -82,18 +86,13 @@ public class Cittadini {
 		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
 		ArrayList<String> centri_trovati = new ArrayList<>();
 		String str;
-		String centro;
 		nome_centro = nome_centro.toLowerCase();
 		
 		br.readLine();  // Leggo la prima riga e la scarto in quanto contiene i campi
 		
 		while ((str = br.readLine()) != null) {
-			if (str.toLowerCase().contains(nome_centro)) {
-				centro = str.split(";")[0];						//sostituibile con un for o un substring?
-				if (centro.toLowerCase().contains(nome_centro))
-					centri_trovati.add(str);
-//					System.out.println("- " + str.substring(1, str.length()-1) + "\n");
-			}
+			if (str.substring(0, str.indexOf(';')).toLowerCase().contains(nome_centro))
+				centri_trovati.add(str);
 		}
 		
 		br.close();
@@ -116,19 +115,13 @@ public class Cittadini {
 		// Scorre tutte le righe del file;
 		while ((str = br.readLine()) != null) {
 			if (str.toLowerCase().contains(comune)) {
-				
 				// Splitta ogni riga in un array di stringhe;
 				columns = str.toLowerCase().split(";");
-				
 				// Se comune e tipologia sono contenute nelle rispettive colonne del file CentriVaccinali.dati allora stampa str; 
 				if (columns[2].contains(tipologia)) {
-					address = columns[1].split(",");
-					if (address[1].contains(comune)) {
-						
+					address = columns[1].split(",");  // Siccome splittiamo per ',' impediamo all'utente di inserire virgole nell'indirizzo, altrimenti potrebbe accadere che il comune non si trovi in address[1]
+					if (address[1].contains(comune))
 						centri_trovati.add(str);
-						// Viene stampata l'intera stringa per aiutare l'utente a visualizzare eventuali errori di ricerca da lui commessi;
-//						System.out.println("- " + str.replace(";", "; "));
-					}
 				}
 			}
 		}
@@ -331,12 +324,9 @@ public class Cittadini {
 		if (logged_userID == null && !login())
 			return false;
 		
-		String choice = "";
-		int check = -1;	// Variabile utilizzata per gestire la scelta dell'utente. Inizializzata a -1 per evitare errori dati dal compilatore;
+		int choice = 0;  // Variabile utilizzata per gestire la scelta dell'utente.
 		int severita[] = new int[6];
 		String note[] = new String[6];
-		
-		int sintomo_selezionato;
 		
 		do {
 			do {
@@ -351,33 +341,36 @@ public class Cittadini {
 				System.out.println("0) Termina");
 				
 				try {
-					choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
-					check = Integer.parseInt(choice);
+					choice = Integer.parseInt(Utili.leggiString(Utili.NEW_LINE + "> ").strip());
 				} catch(NumberFormatException e) {
 					System.out.println(Utili.NEW_LINE + "ERRORE: risposta non valida");
 				}
-			} while(check < 0 || check > 6);
+			} while(choice < 0 || choice > 6);
 			
-			if (!choice.equals("0")) {
-				sintomo_selezionato = Integer.parseInt(choice) - 1;	//Variabile utilizzata per identificare la posizione del sintomo nell'array severita;
+			if (choice != 0) {
+				choice--;
 				
 				do {
 					try {
-						severita[sintomo_selezionato] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.NEW_LINE + "> "));
+						severita[choice] = Integer.parseInt(Utili.leggiString("Inserire severità (da 1 a 5)" + Utili.NEW_LINE + "> "));
 					} catch(NumberFormatException e) {
 						System.out.println(Utili.NEW_LINE + "ERRORE: risposta non valida");
 					}
-				} while (severita[sintomo_selezionato] < 1 || severita[sintomo_selezionato] > 5);
+				} while (severita[choice] < 1 || severita[choice] > 5);
 				
 				if (Utili.leggiSiNo("Desideri aggiungere una nota?")) {
 					do {
-						note[sintomo_selezionato] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.NEW_LINE + "> ");
-						note[sintomo_selezionato].replace("|", "");
-					} while (note[sintomo_selezionato].length() > 256);
+						note[choice] = Utili.leggiString("Inserire nota (max 256 caratteri)" + Utili.NEW_LINE + "> ")
+																								.replace("|", "")
+																								.replace(";", "")
+																								.strip();
+					} while (note[choice].length() > 256);
 				}
+				
+				choice++;
 			}
 			
-		} while(!choice.equals("0"));
+		} while(choice != 0);
 		
 		// Controlla se l'utente ha inserito severità oppure no. Se tutti i valori nell'array severita sono a 0,
 		// il cittadino non avrà inserito niente, perciò termino.
@@ -406,7 +399,7 @@ public class Cittadini {
 		// Se sono arrivato a questo punto, so già che ho da scrivere dei dati, quindi posso iniziare a copiare
 		// nel file temporaneo dei Cittadini_Vaccinati le righe che precedono la riga del cittadino loggato correntemente.
 		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CITTADINI_VACCINATI_PATH));
-		String temp_file_path = "data/Cittadini_Vaccinati_temp.dati";
+		String temp_file_path = MainMenu.CITTADINI_VACCINATI_PATH.substring(0, MainMenu.CITTADINI_VACCINATI_PATH.lastIndexOf('.')) + "_temp" + MainMenu.CITTADINI_VACCINATI_PATH.substring(MainMenu.CITTADINI_VACCINATI_PATH.lastIndexOf('.'));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(temp_file_path));
 		
 		long contatore_riga = 1;
@@ -422,30 +415,32 @@ public class Cittadini {
 		for (int i = 0; i < 7; i++)  // ricopio nella nuova_riga i primi 7 campi (da 0 a 6)
 			nuova_riga.append(dati[i] + ';');
 		
+		int[] severita_sul_file = Stream.of(dati[7].split(SEPARATORE_SEVERITA)).mapToInt(Integer::parseInt).toArray();  // converte l'array di String con le severità prese dal file in un array di int [https://stackoverflow.com/a/37093052]
 		StringBuilder nuove_severita = new StringBuilder();
-		StringBuilder nuove_note_opzionali = new StringBuilder();
 		String[] note_sul_file = dati[8].split("\\|");  // https://stackoverflow.com/a/16311662
+		StringBuilder nuove_note_opzionali = new StringBuilder();
 			
 		// Loop per l'inserimento delle severità e delle note opzionali in nuova_riga
+		// i va da 0 a 10 perché itero ogni carattere del campo EVENTI_AVVERSI_E_SEVERITA
 		for (int i = 0; i < 11; i++) {
 			// dati[7] corrisponde al campo delle severità che sarà nel formato seguente: "0,3,0,2,0,0".
-			if (i % 2 != 0) {  // Se i è dispari appendo il divisore
-				nuove_severita.append(',');
-				nuove_note_opzionali.append('|');
+			if (i % 2 != 0) {  // Se i è dispari appendo il separatore, che per le severità sarà ',' e per le note sarà '|'
+				nuove_severita.append(SEPARATORE_SEVERITA);
+				nuove_note_opzionali.append(SEPARATORE_NOTE_OPZIONALI);
 			} else {
 				if (severita[i/2] != 0) {  // se la severità corrente è != 0 significa che la voglio inserire...
-					if (dati[7].charAt(i) != '0')  // ...però se dati[7].charAt(i) != '0' allora è già presente una severità. Chiedo quindi all'utente se vuole sostituirla con quella appena inserita.
+					if (severita_sul_file[i/2] != 0)  // ...però se dati[7].charAt(i) != '0' allora è già presente una severità. Chiedo quindi all'utente se vuole sostituirla con quella appena inserita.
 						nuove_severita.append(Utili.leggiSiNo("Per l'evento avverso '" +
 																eventi_avversi[i/2] +
 																"' è già presente la severità " +
-																dati[7].charAt(i) +
+																severita_sul_file[i/2] +
 																". Desideri sostituirla con " +
 																severita[i/2] +
-																"?")? severita[i/2] : Character.toString(dati[7].charAt(i)));  // NB: è necessario convertire dati[7].charAt(i) in String perché altrimenti il metodo append converte il char nel numero relativo alla posizione di quel carattere nella tabella ASCII
+																"?")? severita[i/2] : 0);
 					else  // se invece dati[7].charAt(i) == '0' la sostituisco senza chiederlo all'utente.
 						nuove_severita.append(severita[i/2]);
 				} else {  // se invece la severità corrente è 0 significa che non la voglio inserire...
-					nuove_severita.append(Character.toString(dati[7].charAt(i)));  // ...quindi appendo quella già presente
+					nuove_severita.append(0);  // ...quindi appendo 0
 				}
 				
 				if (note_opzionali[i/2] != null) {  // se la nota_opzionale corrente è != null significa che la voglio inserire...
@@ -453,11 +448,11 @@ public class Cittadini {
 					if (!note_sul_file[i/2].equals("#"))
 						nuove_note_opzionali.append(Utili.leggiSiNo("Per la nota opzionale riguardante l'evento avverso '" +
 																	eventi_avversi[i/2] +
-																	"' è già presente la nota " +
+																	"' è già presente la nota '" +
 																	note_sul_file[i/2] +
-																	". Desideri sostituirla con " +
+																	"'. Desideri sostituirla con '" +
 																	note_opzionali[i/2] +
-																	"?")? note_opzionali[i/2] : note_sul_file[i/2]);
+																	"'?")? note_opzionali[i/2] : note_sul_file[i/2]);
 					else  // se invece note_sul_file[i/2].equals("#") la sostituisco senza chiederlo all'utente.
 						nuove_note_opzionali.append(note_opzionali[i/2]);
 				} else {  // se invece la nota corrente è nulla significa che non la voglio inserire...
@@ -465,7 +460,13 @@ public class Cittadini {
 				}
 			}
 		}
-		nuova_riga.append(nuove_severita + ";" + nuove_note_opzionali);
+		
+		int[] nuove_severita_arr = Stream.of(nuove_severita.toString().split(SEPARATORE_SEVERITA)).mapToInt(Integer::parseInt).toArray();
+		for (int i = 0; i < severita_sul_file.length; i++)
+			nuova_riga.append(((nuove_severita_arr[i] != 0) ? nuove_severita_arr[i] : severita_sul_file[i]) + SEPARATORE_SEVERITA);
+		nuova_riga.deleteCharAt(nuova_riga.length()-1);
+		
+		nuova_riga.append(";" + nuove_note_opzionali);
 		
 		bw.write(nuova_riga.toString() + Utili.NEW_LINE);
 		
@@ -478,7 +479,81 @@ public class Cittadini {
 		
 		File to_delete = new File(MainMenu.CITTADINI_VACCINATI_PATH);
 		to_delete.delete();
-		File to_rename = new File("data/Cittadini_Vaccinati_temp.dati");
+		File to_rename = new File(temp_file_path);
+		to_rename.renameTo(to_delete);
+		
+		aggiornaSeveritaMediaENumeroSegnalazioni(dati[4], severita_sul_file, Stream.of(nuove_severita.toString()
+																							.split(","))
+																							.mapToInt(Integer::parseInt)
+																							.toArray());
+	}
+	
+	private static void aggiornaSeveritaMediaENumeroSegnalazioni(String nome_centro_vaccinale, int[] vecchie_severita, int[] nuove_severita) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
+		String temp_file_path = MainMenu.CENTRI_VACCINALI_PATH.substring(0, MainMenu.CENTRI_VACCINALI_PATH.lastIndexOf('.')) + "_temp" + MainMenu.CENTRI_VACCINALI_PATH.substring(MainMenu.CENTRI_VACCINALI_PATH.lastIndexOf('.'));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(temp_file_path));
+		
+		bw.write(br.readLine() + Utili.NEW_LINE);  // Leggo la prima riga e la scrivo nel nuovo file in quanto contiene i campi
+		
+		String s;
+		while ((s = br.readLine()) != null) {
+			if (s.substring(0, s.indexOf(';')).equals(nome_centro_vaccinale))
+				break;
+			else
+				bw.write(s + Utili.NEW_LINE);
+		}
+		
+		String[] dati = s.split(";");
+		double[] severita_medie = Stream.of(dati[3].split(",")).mapToDouble(Double::parseDouble).toArray();
+		int[] numero_segnalazioni = Stream.of(dati[4].split(",")).mapToInt(Integer::parseInt).toArray();
+		
+		for (int i = 0; i < vecchie_severita.length; i++) {
+			if (nuove_severita[i] == 0)
+				continue;
+			else {
+				if (numero_segnalazioni[i] == 0) {
+					numero_segnalazioni[i]++;
+					severita_medie[i] = nuove_severita[i];
+				} else {
+					int vecchio_numero_segnalazioni = numero_segnalazioni[i];
+					if (vecchie_severita[i] == 0)
+						numero_segnalazioni[i]++;
+					int difference = nuove_severita[i] - vecchie_severita[i];
+					
+					double primo_calcolo = (double) vecchio_numero_segnalazioni / (double) numero_segnalazioni[i];
+					double secondo_calcolo = severita_medie[i] * primo_calcolo;
+					double terzo_calcolo = (double) difference / (double) numero_segnalazioni[i];
+					severita_medie[i] = secondo_calcolo + terzo_calcolo;
+//					severita_medie[i] = severita_medie[i] * (
+//													(double) vecchio_numero_segnalazioni / (double) numero_segnalazioni[i]
+//															) + (
+//													(double) difference / (double) numero_segnalazioni[i]
+//																);
+				}
+			}
+		}
+		
+		StringBuilder severita_medie_string = new StringBuilder();
+		for (double severita : severita_medie)
+			severita_medie_string.append(severita + ",");
+		severita_medie_string.deleteCharAt(severita_medie_string.length()-1);
+		
+		StringBuilder numero_segnalazioni_string = new StringBuilder();
+		for (int segnalazione : numero_segnalazioni)
+			numero_segnalazioni_string.append(segnalazione + ",");
+		numero_segnalazioni_string.deleteCharAt(numero_segnalazioni_string.length()-1);
+		
+		String nuova = dati[0] + ';' + dati[1] + ';' + dati[2] + ';' + severita_medie_string.toString() + ';' + numero_segnalazioni_string.toString();
+		bw.write(nuova + Utili.NEW_LINE);
+		while ((s = br.readLine()) != null)
+			bw.write(s + Utili.NEW_LINE);
+		
+		br.close();
+		bw.close();
+		
+		File to_delete = new File(MainMenu.CENTRI_VACCINALI_PATH);
+		to_delete.delete();
+		File to_rename = new File(temp_file_path);
 		to_rename.renameTo(to_delete);
 	}
 	

@@ -51,12 +51,12 @@ public class CentriVaccinali {
 		
 		System.out.println("- Indirizzo:");
 		centro.indirizzo = new Indirizzo();
-		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip().replace(";", "");
-		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip().replace(";", "");
-		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip().replace(";", "");
-		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip().replace(";", "");
-		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip().replace(";", "");
-		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip().replace(";", "");
+		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip().replace(";", "").replace(",", "");
 		centro.tipologia = Utili.inserisciTipologiaCentro(String.format("- Tipologia:%s1) Ospedaliero%s2) Aziendale%s3) Hub%s%s> ",
 																			Utili.NEW_LINE,
 																			Utili.NEW_LINE,
