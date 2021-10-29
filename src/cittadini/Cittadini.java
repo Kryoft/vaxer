@@ -27,6 +27,8 @@ import menu.Utili;
 public class Cittadini {
 	
 	private static final String SEPARATORE_SEVERITA = ",";
+	private static final String SEPARATORE_SEVERITA_MEDIE = ",";
+	private static final String SEPARATORE_NUMERO_SEGNALAZIONI = ",";
 	private static final String SEPARATORE_NOTE_OPZIONALI = "|";
 	
 	// memorizzo la coppia "ID_vaccinazione, riga" così da poter ottenere subito la riga cui un cittadino è scritto dato il suo ID di vaccinazione
@@ -131,33 +133,41 @@ public class Cittadini {
 	}
 	
 	public static void visualizzaInfoCentroVaccinale() throws IOException {
-		ArrayList<String> centri_trovati = scegliCriterioRicerca(); // Lista utilizzata per tenere traccia di tutti i centri vaccinali trovati in modo da permettere all'utente di selezionarne uno;
-		String[] columns = null;
-		String str;
+		ArrayList<String> centri_trovati = scegliCriterioRicerca(); // Lista utilizzata per tenere traccia di tutti i centri vaccinali trovati in modo da permettere all'utente di selezionarne uno
 		
-		// Se sono stati trovati dei centri l'utente può selezionarne uno;
+		// Se sono stati trovati dei centri l'utente può selezionarne uno
 		if (centri_trovati.isEmpty())
-			System.out.println("Non ho trovato centri con questo nome" + Utili.NEW_LINE);
+			System.out.println("Nessun centro trovato." + Utili.NEW_LINE);
 		else {
 			System.out.println(Utili.NEW_LINE + "- Centri Trovati -");
-			int scelta = selezionaCentro(centri_trovati, "Seleziona uno dei centri sopra elencati per visualizzarne le informazioni: ", "Annulla");
+			int scelta = selezionaCentro(centri_trovati, "Seleziona uno dei centri elencati per visualizzarne le informazioni: ", "Annulla");
 			
-			if (scelta == 0)
-				return;
-			
-			str = centri_trovati.get(--scelta);	// Recupera dalla lista centriTrovati il centro selezionato dall'utente;
-			columns = str.split(";");
-			System.out.println(Utili.NEW_LINE + "- Informazioni -");
-			// Costruisce e stampa la stringa di output per le informazioni sul centro vaccinale;
-			System.out.println(String.format("Nome Centro: %s%sIndirizzo: %s%sTipologia: %s%s",
-												columns[0],
+			if (scelta != 0) {
+				StringBuilder output = new StringBuilder();
+				String[] columns = centri_trovati.get(--scelta).split(";");  // Recupera dalla lista centri_trovati il centro selezionato dall'utente, poi splitta la stringa con i vari campi
+				
+				output.append(String.format(Utili.NEW_LINE + "- Informazioni -" + Utili.NEW_LINE +
+						"Nome Centro: %s%sIndirizzo: %s%sTipologia: %s%sEventi Avversi: ",
+						columns[0],
+						Utili.NEW_LINE,
+						columns[1],
+						Utili.NEW_LINE,
+						columns[2],
+						Utili.NEW_LINE));
+				
+				double[] severita_medie = Stream.of(columns[3].split(SEPARATORE_SEVERITA_MEDIE)).mapToDouble(Double::parseDouble).toArray();
+				int[] numero_segnalazioni = Stream.of(columns[4].split(SEPARATORE_NUMERO_SEGNALAZIONI)).mapToInt(Integer::parseInt).toArray();
+				
+				for (int i = 0; i < 6; i++) {
+					output.append(String.format("%s - %s: %s (Severità media), %s (Numero di segnalazioni)",
 												Utili.NEW_LINE,
-												columns[1],
-												Utili.NEW_LINE,
-												columns[2],
-												Utili.NEW_LINE));
-			
-			//TODO tramite il nome del centro cercare tutti i vaccinati nel centro di riferimento utilizzando il file Cittadini_Vaccinati.dati per mostrare la tabella riassuntiva degli eventi avversi segnalati;
+												eventi_avversi[i],
+												severita_medie[i],
+												numero_segnalazioni[i]));
+				}
+				
+				System.out.println(output.toString() + Utili.NEW_LINE);
+			}
 		}
 	}
 	
@@ -535,12 +545,12 @@ public class Cittadini {
 		
 		StringBuilder severita_medie_string = new StringBuilder();
 		for (double severita : severita_medie)
-			severita_medie_string.append(severita + ",");
+			severita_medie_string.append(severita + SEPARATORE_SEVERITA_MEDIE);
 		severita_medie_string.deleteCharAt(severita_medie_string.length()-1);
 		
 		StringBuilder numero_segnalazioni_string = new StringBuilder();
 		for (int segnalazione : numero_segnalazioni)
-			numero_segnalazioni_string.append(segnalazione + ",");
+			numero_segnalazioni_string.append(segnalazione + SEPARATORE_NUMERO_SEGNALAZIONI);
 		numero_segnalazioni_string.deleteCharAt(numero_segnalazioni_string.length()-1);
 		
 		String nuova = dati[0] + ';' + dati[1] + ';' + dati[2] + ';' + severita_medie_string.toString() + ';' + numero_segnalazioni_string.toString();
