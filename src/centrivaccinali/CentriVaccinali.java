@@ -67,7 +67,7 @@ public class CentriVaccinali {
 		
 		// Scrive sul file CentriVaccinali.dati il nuovo centro vaccinale;
 		Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true,
-							String.format("%s;%s;%s;;%s",
+							String.format("%s;%s;%s;0,0,0,0,0,0;0,0,0,0,0,0%s",
 									centro.nome_centro,
 									centro.indirizzo.toString(),
 									centro.tipologia,

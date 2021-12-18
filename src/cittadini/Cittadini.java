@@ -258,7 +258,7 @@ public class Cittadini {
 		cittadino.cognome = Utili.leggiString("- Cognome > ").strip().replace(";", "");
 		cittadino.codice_fiscale = Utili.leggiString("- Codice Fiscale > ").strip().replace(";", "");
 		cittadino.indirizzo_email = Utili.leggiString("- Indirizzo e-mail > ").strip().replace(";", "");	// (opzionale) controllo se si tratta di una email
-		cittadino.user_id = Utili.leggiString("- User ID > ").strip().replace(";", "");
+		cittadino.user_id = Utili.leggiString("- User ID > ").strip().replace(";", "").toLowerCase();
 		cittadino.password = sha256(Utili.leggiString("- Password > "));
 		
 		Long num_riga = null;
@@ -576,7 +576,7 @@ public class Cittadini {
 		System.out.println(Utili.NEW_LINE + "- LOGIN -");
 		
 		do {
-			user_ID = Utili.leggiString("- UserID > ");
+			user_ID = Utili.leggiString("- UserID > ").toLowerCase();
 		} while ((riga = cittadini_registrati.get(user_ID)) == null && Utili.leggiSiNo(Utili.NEW_LINE +
 																		"L'UserID non esiste. Riprovare?"));
 		
@@ -584,7 +584,7 @@ public class Cittadini {
 			dati = Utili.leggiRiga(MainMenu.CITTADINI_REGISTRATI_PATH, riga).split(";");
 		}
 		
-		if (dati[5] != null) {
+		if (dati != null && dati[5] != null) {
 			do {
 				logged_in = (dati[5].equals(sha256(Utili.leggiString("- Password > ")))) ? true : false;
 			} while (!logged_in && Utili.leggiSiNo(Utili.NEW_LINE +
