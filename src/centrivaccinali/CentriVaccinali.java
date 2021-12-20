@@ -4,6 +4,9 @@
  * Manuel Marceca, 746494, CO
  */
 
+/**
+ * Package contenente la classe <code>Indirizzo</code>
+ */
 package centrivaccinali;
 
 import java.io.IOException;
@@ -19,17 +22,60 @@ import cittadini.Cittadini;
 import menu.MainMenu;
 import menu.Utili;
 
+/**
+ * 
+ * <code>CentriVaccinali</code> contiene tutte le operazioni necessarie alla gestione dei centri vaccinali,
+ * utilizzando come appoggio vari metodi contenuti in <code>menu.Utili</code>.
+ * 
+ * @see menu.Utili
+ * 
+ * @author Cristian Corti
+ * @author Manuel Marceca
+ *
+ */
 public class CentriVaccinali {
 	
+	/**
+	 * Attributo che memorizza il nome del centro in formato <code>String</code>.
+	 */
 	String nome_centro;
+	
+	/**
+	 * Attributo di tipo <code>Indirizzo</code> che memorizza in un record i dati riguardanti l'indirizzo del 
+	 * relativo centro vaccinale.
+	 * 
+	 * @see centrivaccinali.Indirizzo
+	 */
 	Indirizzo indirizzo;
+	
+	/**
+	 * Attributo di tipo <code>String</code> in cui è memorizzata la tipologia di centro vaccinale 
+	 * (ospedaliero, aziendale o HUB).
+	 */
 	String tipologia;
+	
 	
 	/*
 	 * Costruttore rimosso perchè si andranno a modificare i campi una volta creato l'oggetto, come per le altre classi.
 	 */
 	
 	// Lista principali centri vaccinali in Italia : https://www.governo.it/it/cscovid19/report-vaccini/
+	
+	/**
+	 * Registra un centro vaccinale memorizzando i dati nell'oggetto <code>centro</code> e li scrive sul relativo 
+	 * file di testo <code>CentriVaccinali.dati</code>.
+	 * Nel caso in cui tale file non esista, verrà creato.
+	 * Se il file esiste e contiene già un centro con lo stesso nome, <code>null</code> verrà ritornato.
+	 * 
+	 * @see menu.MainMenu
+	 * 
+	 * @return <strong>centro</strong>
+	 * 		Un oggetto di tipo <code>CentriVaccinali</code> contenente i dati del centro registrato.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 * 	
+	 */
 	public static CentriVaccinali registraCentroVaccinale() throws IOException {
 		// Inizializza un oggetto "CentriVaccinali" e successivamente richiede le informazioni necessarie all'utente;
 		CentriVaccinali centro = new CentriVaccinali();
@@ -78,6 +124,20 @@ public class CentriVaccinali {
 	}
 	
 	//Modificato il valore restituito da void a boolean per restituire false se il centro vaccinale in cui si vogliono inserire i dati non esiste;
+	
+	/**
+	 * Registra un vaccinato richiedendo all'utente di inserire i dati, che saranno poi scritti sul file 
+	 * <code>Cittadini_Vaccinati.dati</code>.
+	 * Un nuovo ID viene generato per tale scopo.
+	 * Nel caso in cui tale file non esista, verrà creato.
+	 * 
+	 * @return <strong>boolean</strong>
+	 * 		In caso di fallimento dell'operazione (centro vaccinale non trovato) <code>false</code> è ritornato.
+	 * 		In caso di successo, <code>true</code> è ritornato.
+	 * 
+	 * @throws IOException	
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static boolean registraVaccinato() throws IOException {
 		/* 
 		 * Campi per il file Cittadini_Vaccinati:
@@ -140,6 +200,18 @@ public class CentriVaccinali {
 		return true;
 	}
 	
+	
+	/**
+	 * Chiede all'utente di digitare il nome del centro e ne verifica la presenza nel file <code>CentriVaccinali.dati</code>.
+	 * Nel caso nessuna corrispondenza non è trovata, ritorna <code>null</code>.
+	 * 
+	 * @return <strong>nome_centro</strong>
+	 * 		Il nome del centro a cui corrisponde la ricerca effettuata secondo l'input dell'utente.
+	 * 		Nel caso in cui il processo fallisca, <code>null</code> viene ritornato.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */		
 	private static String ottieniNomeCentro() throws IOException {
 		String nome_centro;
 		ArrayList<String> centri_trovati;
@@ -192,6 +264,16 @@ public class CentriVaccinali {
 //		return nuovo_codice_str.toString();
 //	}
 	
+	
+	/**
+	 * Genera un ID di vaccinazione di 16 caratteri alfanumerici casuale e unico.
+	 * Verifica la presenza o meno dell'ID tra quelli già presenti verificando se è presente nella HashMap.
+	 * 
+	 * @see java.util.HashMap.HashMap<String, Long>()
+	 * 
+	 * @return <strong>codice</strong>
+	 * 		L'ID generato
+	 */
 	private static String generaNuovoId() {
 		StringBuilder nuovo_codice = new StringBuilder();
 		String codice;
@@ -211,11 +293,27 @@ public class CentriVaccinali {
 		return codice;
 	}
 	
+	
+	/**
+	 * Genera una stringa contenente i dati relativi agli attributi dell'oggetto di tipo <code>CentriVaccinali</code>.
+	 * 
+	 * @return <strong>String</strong>
+	 * 		una stringa contenente i dati contenuti nell'oggetto di tipo  <code>CentriVaccinali</code>
+	 */
 	@Override
 	public String toString() {
 		return String.format("Nome Centro: %s\nIndirizzo: %s\nTipologia: %s", nome_centro, indirizzo.toString(), tipologia);
 	}
 
+	
+	/**
+	 * Il main della classe {@link #CentriVaccinali}.
+	 * <p>
+	 * Utilizzato per interagire con l'utente stampando messaggi sul terminale e richiedendo risposte in input.
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		// chiede all'utente di inserire ogni campo dell'Indirizzo
 		

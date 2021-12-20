@@ -24,21 +24,91 @@ import java.util.stream.Stream;
 import menu.MainMenu;
 import menu.Utili;
 
+
+/**
+ * <code>CentriVaccinali</code> contiene tutte le operazioni necessarie agli utenti cittadini,
+ * utilizzando come appoggio vari metodi contenuti in <code>menu.Utili</code>.
+ * 
+ * @see menu.Utili
+ * 
+ * @author Cristian Corti
+ * @author Manuel Marceca
+ */
 public class Cittadini {
 	
+	/**
+	 * Definizione del separatore utilizzato per le severità nel file di testo, ovvero ",".
+	 */
 	private static final String SEPARATORE_SEVERITA = ",";
+	
+	/**
+	 * Definizione del separatore utilizzato per le severità medie nel file di testo, ovvero ",".
+	 */
 	private static final String SEPARATORE_SEVERITA_MEDIE = ",";
+	
+	/**
+	 * Definizione del separatore utilizzato per i numeri di segnalazioni nel file di testo, ovvero ",".
+	 */
 	private static final String SEPARATORE_NUMERO_SEGNALAZIONI = ",";
+	
+	/**
+	 * Definizione del separatore utilizzato per le note opzionali nel file di testo, ovvero "|".
+	 */
 	private static final String SEPARATORE_NOTE_OPZIONALI = "|";
 	
 	// memorizzo la coppia "ID_vaccinazione, riga" così da poter ottenere subito la riga cui un cittadino è scritto dato il suo ID di vaccinazione
+	
+	/**
+	 * HashMap contenente i cittadini vaccinati.
+	 * 
+	 * @see java.util.HashMap.HashMap<String, Long>()
+	 */
 	public static Map<String, Long> cittadini_vaccinati = new HashMap<>();
+	
+	/**
+	 * Memorizza il numero di righe presenti nel file <code>Cittadini_Vaccinati.dati</code>.
+	 */
 	public static long numero_righe_file_cittadini_vaccinati = 0;
+	
 	// memorizzo la coppia "user_ID, riga" perché memorizzare "user_ID, password" direttamente avrebbe un gran peso sulla memoria RAM (la password è sempre di 64 caratteri).
+	
+	/**
+	 * HashMap contenente i cittadini registrati.
+	 * 
+	 * @see java.util.HashMap.HashMap<String, Long>()
+	 */
 	public static Map<String, Long> cittadini_registrati = new HashMap<>();
+	
+	/**
+	 * Memorizza il numero di righe presenti nel file <code>Cittadini_Registrati.dati</code>.
+	 */
 	public static long numero_righe_file_cittadini_registrati = 0;
+	
+	/**
+	 * Memorizza l'user ID dell'utente loggato.
+	 */
 	private static String logged_userID;
+	
+	/**
+	 * Memorizza l'ID dell'utente loggato.
+	 */
 	private static String logged_ID;
+	
+	/**
+	 * Array di stringhe contenente i vari sintomi (eventi avversi), quali:
+	 * <br>
+	 * -Mal di testa;
+	 * <br>
+	 * -Febbre;
+	 * <br>
+	 * -Dolori muscolari e articolari;
+	 * <br>
+	 * -Linfoadenopatia;
+	 * <br>
+	 * -Tachicardia;
+	 * <br>
+	 * -Crisi ipertensiva.
+	 */
 	private static final String[] eventi_avversi = {"Mal di testa",
 													"Febbre",
 													"Dolori muscolari e articolari",
@@ -46,14 +116,57 @@ public class Cittadini {
 													"Tachicardia",
 													"Crisi ipertensiva"};
 	
+	/**
+	 * Stringa contenente il nome del cittadino.
+	 */
 	private String nome;
+	
+	/**
+	 * Stringa contenente il cognome del cittadino.
+	 */
 	private String cognome;
+	
+	/**
+	 * Stringa contenente il codice fiscale del cittadino.
+	 */
 	private String codice_fiscale;
+	
+	/**
+	 * Stringa contenente l'indirizzo e-mail del cittadino.
+	 */
 	private String indirizzo_email;
+	
+	/**
+	 * Stringa contenente l'user ID del cittadino.
+	 */
 	private String user_id;
+	
+	/**
+	 * Stringa contenente la password del cittadino.
+	 */
 	private String password;
+	
+	/**
+	 * Stringa contenente l'ID vaccinazione del cittadino.
+	 */
 	private String id_vaccinazione;
 	
+	
+	/**
+	 * Permette all'utente di selezionare un criterio di ricerca per trovare un centro vaccinale.
+	 * <p>
+	 * La ricerca avverrà quindi con l'appoggio del metodo {@link #cercaCentroVaccinale(String nome_centro)} o
+	 * {@link #cercaCentroVaccinale(String comune, String tipologia)}, quale può
+	 * essere chiamato in diversi modi a causa del polimorfismo di tale metodo.
+	 * 
+	 * @see cittadini.Cittadini.cercaCentroVaccinale(String nome_centro)
+	 * @see cittadini.Cittadini.cercaCentroVaccinale(String comune, String tipologia)
+	 * 
+	 * @return {@link <strong>cercaCentroVaccinale(centro)</strong>} oppure {@link <strong>cercaCentroVaccinale(comune,tipologia)</strong>}
+	 * 		
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static ArrayList<String> scegliCriterioRicerca() throws IOException {
 		while (true) {
 			System.out.println(Utili.NEW_LINE + "- Scelta Criterio di Ricerca -");
@@ -83,6 +196,21 @@ public class Cittadini {
 		}
 	}
 	
+	
+	/**
+	 * Cerca un centro vaccinale dato il nome del centro. 
+	 * <p>
+	 * Ritorna la lista delle possibili corrispondenze, da cui l'utente selezionerà quella ricercata.
+	 * 
+	 * @param nome_centro
+	 * 		Il nome del centro vaccinale ricercato.
+	 * 
+	 * @return <strong>centri_trovati</strong>
+	 * 		Una lista contenente i centri per cui vale la corrispondenza con il parametro <code>nome_centro</code>.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static ArrayList<String> cercaCentroVaccinale(String nome_centro) throws IOException {
 		// Cercare i centri il cui nome contiene la stringa passata come argomento nel file CentriVaccinali.dati;
 		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
@@ -101,6 +229,24 @@ public class Cittadini {
 		return centri_trovati;
 	}
 	
+	
+	/**
+	 * Cerca un centro vaccinale dato il nome del comune e la tipologia del centro. 
+	 * <p>
+	 * Ritorna la lista delle possibili corrispondenze, da cui l'utente selezionerà quella ricercata.
+	 * 
+	 * @param comune
+	 * 		Il nome del comune in cui è situato il centro.
+	 * 
+	 * @param tipologia
+	 * 		La tipologia del centro ricercato (Ospedaliero, Aziendale o HUB).
+	 * 
+	 * @return <strong>centri_trovati</strong>
+	 * 		Una lista contenente i centri per cui vale la corrispondenza con il parametro <code>nome_centro</code>.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static ArrayList<String> cercaCentroVaccinale(String comune, String tipologia) throws IOException {
 		// Cercare i centri il cui comune e tipologia corrispondono ai dati passati come argomento nel file CentriVaccinali.dati;
 		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
@@ -132,6 +278,17 @@ public class Cittadini {
 		return centri_trovati;
 	}
 	
+	
+	/**
+	 * Stampa sul terminale le informazioni di uno specifico centro vaccinale, selezionato dall'utente dopo una ricerca.
+	 * 
+	 * @see cittadini.Cittadini.scegliCriterioRicerca()
+	 * @see cittadini.Cittadini.selezionaCentro(ArrayList{@literal <String>} centri_trovati, String messaggio_di_scelta, String messaggio_di_annullamento)
+	 * @see java.util.ArrayList{@literal <String>}
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static void visualizzaInfoCentroVaccinale() throws IOException {
 		ArrayList<String> centri_trovati = scegliCriterioRicerca(); // Lista utilizzata per tenere traccia di tutti i centri vaccinali trovati in modo da permettere all'utente di selezionarne uno
 		
@@ -171,6 +328,27 @@ public class Cittadini {
 		}
 	}
 	
+	
+	/**
+	 * Data una lista di centri, permette all'utente di selezionare il centro da lui ricercato.
+	 * 
+	 *  @see java.util.ArrayList{@literal <String>}
+	 * 
+	 * @param centri_trovati
+	 * 		ArrayList contenente i centri trovati
+	 * 
+	 * @param messaggio_di_scelta
+	 * 		Messaggio stampato su terminale per indicare all'utente la possibilità di scelta
+	 * 
+	 * @param messaggio_di_annullamento
+	 * 		Messaggio stampato su terminale per indicare all'utente il comando di annullamento dell'operazione
+	 * 
+	 * @return <strong>scelta</strong>
+	 * 		La scelta dell'utente (un intero).
+	 * 		
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static int selezionaCentro(ArrayList<String> centri_trovati, String messaggio_di_scelta, String messaggio_di_annullamento) throws IOException {
 		int scelta;  // Integer utilizzato per far selezionare all'utente un centro vaccinale nella lista centri_trovati;
 		int counter = 1;
@@ -192,6 +370,21 @@ public class Cittadini {
 		return scelta;  // if (scelta == 0) then l'utente vuole annullare la selezione
 	}
 	
+	
+	/**
+	 * Legge il contenuto di <code>Cittadini_Vaccinati.dati</code> e lo inserisce nella HashMap.
+	 * 
+	 * @see java.util.HashMap
+	 * 
+	 * @return <strong>boolean</strong>
+	 * 		<br>
+	 * 		<code>true</code> nel caso in cui l'operazione termini con successo.
+	 * 		<br>
+	 * 		<code>false</code> in caso contrario (file <code>Cittadini_Vaccinati.dati</code> non esistente).
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static boolean caricaCittadiniVaccinati() throws IOException {
 		if (!Files.exists(Paths.get(MainMenu.CITTADINI_VACCINATI_PATH)))
 			return false;
@@ -210,6 +403,19 @@ public class Cittadini {
 		return true;
 	}
 	
+	
+	/**
+	 * Legge il contenuto di <code>Cittadini_Registrati.dati</code> e lo inserisce nella HashMap.
+	 * 
+	 * @return <strong>boolean</strong>
+	 * 		<br>
+	 * 		<code>true</code> nel caso in cui l'operazione termini con successo.
+	 * 		<br>
+	 * 		<code>false</code> in caso contrario (file <code>Cittadini_Registrati.dati</code> non esistente).
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static boolean caricaCittadiniRegistrati() throws IOException {
 		if (!Files.exists(Paths.get(MainMenu.CITTADINI_REGISTRATI_PATH)))
 			return false;
@@ -237,6 +443,14 @@ public class Cittadini {
 		return true;
 	}
 	
+	
+	/**
+	 * Permette ad un utente di registrarsi, inserendo i propri dati, i quali saranno poi memorizzati in 
+	 * <code>Cittadini_Registrati.dati</code>.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static void registraCittadino() throws IOException {
 		/*
 		 * Inserisce i campi dell'oggetto che invoca la funzione nel file Cittadini_Registrati.dati
@@ -310,6 +524,16 @@ public class Cittadini {
 		raf.close();
 	}
 	
+	
+	/**
+	 * Data una password come parametro, ne restituisce la stringa cui rappresenta la password criptata.
+	 * 
+	 * @param base
+	 * 		La password.
+	 * 
+	 * @return {@link hexString.toString()}
+	 *  	La password criptata.
+	 */
 	public static String sha256(String base) {
 		/*
 		 * https://stackoverflow.com/questions/3103652/hash-string-via-sha-256-in-java/25243174#25243174 -- Spiegazione funzionamento codice
@@ -330,6 +554,25 @@ public class Cittadini {
 	}
 	
 	// Può essere invocato solo dopo aver effettuato il login;
+	
+	/**
+	 * Permette all'utente di segnalare eventuali sintomi/eventi avversi verificati dopo la vaccinazione.
+	 * <p>
+	 * L'insistenza di un sintomo può essere definito in una scala da 1 a 5, ed eventualmente affiancata ad una
+	 * nota personale.
+	 * <p>
+	 * Tali dati sono utilizzati da ogni centro vaccinale per determinare una media dei valori riscontrati per ogni
+	 * sintomo.
+	 * 
+	 * @return <strong>boolean</strong>
+	 * 		<br>
+	 * 		<code>true</code> nel caso in cui l'operazioni termini con successo.
+	 *		<br>
+	 *		<code>false</code> in caso contrario.
+	 *
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static boolean inserisciEventiAvversi() throws IOException {
 		if (logged_userID == null && !login())
 			return false;
@@ -405,6 +648,26 @@ public class Cittadini {
 		return true;
 	}
 	
+	
+	/**
+	 * Inseriti gli eventi avversi con la funzione {@link #inserisciEventiAvversi()}, questi vengono memorizzati
+	 * sui file di testo <code>Cittadini_Vaccinati.dati</code> e di conseguenza i dati del centro vaccinale
+	 * nel quale l'utente è stato vaccinato devono essere aggiornato (media delle severità).
+	 * 
+	 * @see cittadini.Cittadini.inserisciEventiAvversi()
+	 * 
+	 * @param severita
+	 * 		Array contenente i valori in scala da 1 a 5 per i sintomi riscontrati dall'utente.
+	 * 
+	 * @param note_opzionali
+	 * 		Array contenente le note per gli eventuali sintomi riscontrati dall'utente.
+	 * 
+	 * @param riga
+	 * 		La riga relativa all'utente nel file <code>Cittadini_Vaccinati.dati</code>.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	private static void memorizzaEventiAvversi(int[] severita, String[] note_opzionali, long riga) throws IOException {
 		// Se sono arrivato a questo punto, so già che ho da scrivere dei dati, quindi posso iniziare a copiare
 		// nel file temporaneo dei Cittadini_Vaccinati le righe che precedono la riga del cittadino loggato correntemente.
@@ -498,6 +761,24 @@ public class Cittadini {
 																							.toArray());
 	}
 	
+	
+	/**
+	 * Aggiorna la severità media ed il numero delle segnalazioni del centro vaccinale indicato come parametro.
+	 * 
+	 * @see java.lang.StringBuilder
+	 * 
+	 * @param nome_centro_vaccinale
+	 * 		Il nome del centro vaccinale cui si vuole aggiornare media e numero severità.
+	 * 
+	 * @param vecchie_severita
+	 * 		L'array contenente le severità che erano presenti sul file <code>Cittadini_Vaccinati.dati</code>.
+	 * 
+	 * @param nuove_severita
+	 * 		L'array contenente le severità aggiornate dall'utente.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	private static void aggiornaSeveritaMediaENumeroSegnalazioni(String nome_centro_vaccinale, int[] vecchie_severita, int[] nuove_severita) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(MainMenu.CENTRI_VACCINALI_PATH));
 		String temp_file_path = MainMenu.CENTRI_VACCINALI_PATH.substring(0, MainMenu.CENTRI_VACCINALI_PATH.lastIndexOf('.')) + "_temp" + MainMenu.CENTRI_VACCINALI_PATH.substring(MainMenu.CENTRI_VACCINALI_PATH.lastIndexOf('.'));
@@ -567,6 +848,16 @@ public class Cittadini {
 		to_rename.renameTo(to_delete);
 	}
 	
+	
+	/**
+	 * Esegue le operazioni necessarie al login dell'utente.
+	 * 
+	 * @return <strong>logged_in</strong>
+	 * 		Determina se il login è avvenuto con successo o meno (rispettivamente <code>true</code> o <code>false</code>.
+	 * 		
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	private static boolean login() throws IOException {
 		boolean logged_in = false;
 		Long riga;
@@ -599,6 +890,15 @@ public class Cittadini {
 		return logged_in;
 	}
 	
+	
+	/**
+	 * Il main della classe {@link #Cittadini}.
+	 * <p>
+	 * Utilizzato per interagire con l'utente stampando messaggi sul terminale e richiedendo risposte in input.
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		
 		String choice;
