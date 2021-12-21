@@ -4,12 +4,7 @@
  * Manuel Marceca, 746494, CO
  */
 
-/**
- * package contenente <code>CentriVaccinali</code>.
- * @see centrivaccinali.CentriVaccinali
- */
 package centrivaccinali;
-
 
 /**
  * Questa classe instanzia dei record che saranno utilizzati per la memorizzazione temporanea di dati che
@@ -23,12 +18,12 @@ package centrivaccinali;
 public class Indirizzo {
 	
 	/**
-	 *  Il <code>qualificatore</code>  es. (via/v.le/pzza/strada/...)
+	 *  Il qualificatore dell'Indirizzo (es. via/v.le/pzza/strada/...)
 	 */
 	String qualificatore;
 	
 	/**
-	 * Il <code>nome</code> della via/piazza/....
+	 * Il nome della via/piazza/...
 	 */
 	String nome;
 	
@@ -38,7 +33,7 @@ public class Indirizzo {
 	String numero_civico;
 	
 	/**
-	 * Il <code>comune</code>
+	 * Il comune
 	 */
 	String comune;
 	

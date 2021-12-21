@@ -4,9 +4,6 @@
  * Manuel Marceca, 746494, CO
  */
 
-/**
- * Parte del package <code>menu</code>, contenente la classe <code>MainMenu</code>
- */
 package menu;
 
 import java.io.BufferedReader;
@@ -19,12 +16,9 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-
-
 /**
- * 
  * <code>Utili</code> è una classe astratta contenente vari metodi utilizzati in tutta l'applicazione
- * per rendere più scorrevole e semplice l'utilizzo e la lettura delle funzionalità relative.
+ * per l'esecuzione di varie funzionalità.
  * 
  * @see menu.MainMenu
  * @see centrivaccinali.CentriVaccinali
@@ -33,6 +27,7 @@ import java.nio.file.Paths;
  * @author Cristian Corti
  * @author Manuel Marceca
  */
+
 public abstract class Utili {
 	
 	/**
@@ -64,24 +59,24 @@ public abstract class Utili {
 	 */
 	public static final String NEW_LINE = System.getProperty("line.separator");  // https://stackoverflow.com/questions/36796136/difference-between-system-getpropertyline-separator-and-n
 	
-	
 	/**
 	 * <code>raf</code> è un oggetto di tipo RandomAccessFile contenente un'istanza dell'oggetto di tipo
 	 * <code>RandomAccessFile</code>.
-	 * Utile alla lettura e scrittura sui file di testo.
+	 * Utile alla lettura e scrittura su file byte per byte.
 	 * 
 	 * @see java.io.RandomAccessFile
 	 */
 	static RandomAccessFile raf;
 	
-	
 	/**
-	 * Stampa un messaggio su terminale e richiede l'inserimento di input via tastiera, il quale sarà ritornato
+	 * Stampa un messaggio sulla stream di output "standard" e richiede l'inserimento di input via tastiera,
+	 * il quale sarà restituito.
 	 * 
 	 * @param message
-	 * 		Una stringa di tipo <code>String</code>.
+	 * 		Un oggetto di tipo <code>String</code> che rappresenta il messaggio che si vuole mostrare
+	 * 		prima di richiedere l'input all'utente.
 	 * 
-	 * @return {@link #in.readline()}
+	 * @return
 	 * 		La stringa inserita in input.
 	 * 
 	 * @throws IOException
@@ -91,7 +86,6 @@ public abstract class Utili {
 		System.out.print(message);
 		return in.readLine();
 	}
-	
 	
 	/**
 	 * Stampa un messaggio sul terminale seguito dalla stringa " (Sì / No)". Richiede quindi
@@ -123,15 +117,14 @@ public abstract class Utili {
 		}
 	}
 	
-	
 	/**
-	 * Appende la stringa <code>testo</code> al file allocato nel percorso <code>path</code>.
+	 * Scrive o appende la stringa <code>testo</code> al file allocato nel percorso <code>path</code>.
 	 * 
 	 * @param path
 	 * 		Il percorso del file su cui si vuole scrivere.
 	 * 
 	 * @param append
-	 * 		true se si vuole appendere il <code>testo</code> al file. False in caso contrario.
+	 * 		true se si vuole appendere il <code>testo</code> al file. false in caso contrario.
 	 * 
 	 * @param testo
 	 * 		Una stringa di testo contenente i dati che si vogliono appendere al file di testo.
@@ -144,7 +137,6 @@ public abstract class Utili {
 		bw.append(testo);
 		chiudiWriter();
 	}
-	
 	
 	/**
 	 * Crea un file di testo nel percorso <code>path</code>.
@@ -160,12 +152,9 @@ public abstract class Utili {
 		chiudiWriter();
 	}
 	
-	
 	/**
-	 * Dato il parametro <code>message</code>, questo viene stampato. In base all'input dell'utente,
-	 * la scelta tra le opzioni "Ospedaliero", "Aziendale" e "Hub" viene selezionata.
-	 * <p>
-	 * Utilizzato in <code>CentriVaccinali</code>.
+	 * Memorizza l'output del metodo {@link #leggiString(message)}, il quale richiede l'input all'utente.
+	 * In base all'input fornito, una tra le opzioni "Ospedaliero", "Aziendale" e "Hub" viene selezionata e restituita.
 	 * 
 	 * @see centrivaccinali.CentriVaccinali
 	 * 
@@ -195,9 +184,8 @@ public abstract class Utili {
 		}
 	}
 	
-	
 	/**
-	 * Legge il contenuto della <code>riga</code> trovata nel file di testo nel percorso <code>file_path</code>
+	 * Legge il contenuto della riga all'indice <code>riga</code> nel file di testo <code>file_path</code>
 	 * 
 	 * @param file_path
 	 * 		Il percorso del file di testo.
@@ -229,8 +217,6 @@ public abstract class Utili {
 		return s;
 	}
 	
-	// Questo metodo permette di leggere l'ultima riga di un file senza
-	// scorrerne tutte le righe con il BufferedReader
 	/**
 	 * Legge l'ultima riga del file nel percorso <code>file_path</code> senza scorrerne tutte le 
 	 * righe con il BufferedReader.
@@ -256,7 +242,7 @@ public abstract class Utili {
 		 * 1) se leggessi da raf.length(), raf.readByte() lancerebbe una EOFException (End Of File Exception)
 		 * perché tenterei di leggere dalla fine del file;
 		 * 2) se leggessi da raf.length()-1 leggerei subito il carattere '\n' perché è l'ultimo che
-		 * viene scritto (o forse non leggerei niente perché '\n' occupa 2 bytes https://stackoverflow.com/questions/15290203/why-is-a-newline-2-bytes-in-windows).
+		 * viene scritto (N.B. '\n' occupa 2 bytes https://stackoverflow.com/questions/15290203/why-is-a-newline-2-bytes-in-windows).
 		 * Se appunto chiamassi raf.readLine() otterrei null
 		 */
 		long index = raf.length()-2;
@@ -270,15 +256,14 @@ public abstract class Utili {
 		return line;
 	}
 	
-	
 	/**
 	 * Inizializza FileWriter <code>fw</code> e BufferedWriter <code>bw</code>.
 	 * 
 	 * @param path
-	 * 		Percorso del file di testo.
+	 * 		Percorso del file di testo dove si desidera scrivere.
 	 *
 	 * @param append
-	 * 		true se si desidera appendere o meno stringhe al file di testo. False in caso contrario.
+	 * 		true se si desidera appendere o meno caratteri in fondo al file di testo. false in caso contrario.
 	 * 
 	 * @throws IOException
 	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
@@ -287,7 +272,6 @@ public abstract class Utili {
 		fw = new FileWriter(path, append);
 		bw = new BufferedWriter(fw);
 	}
-	
 	
 	/**
 	 * Termina gli stream di <code>FileWriter</code> e <code>BufferedWriter</code>.
@@ -300,19 +284,20 @@ public abstract class Utili {
 		fw.close();
 	}
 	
-	
 	/**
-	 * Utilizzata in fase di testing.
+	 * Memorizza la differenza di tempo (in millisecondi) tra questo momento e la mezzanotte
+	 * del 1 Gennaio 1970 UTC.
+	 * <br>Utilizzata in fase di testing.
 	 */
 	public static void startTimer() {
 		start_time = System.currentTimeMillis();
 	}
 	
 	/**
-	 * Ritorna il tempo trascorso dalla chiamata di {@link #startTimer()} in una stringa.
+	 * Ritorna il tempo (in millisecondi) trascorso dalla chiamata di {@link #startTimer()} in una stringa.
 	 * 
 	 * @return <strong>String</strong>
-	 * 		Come stringa, il tempo trascorso dalla chiamata di {@link #startTimer()}.
+	 * 		Come stringa, il tempo (in millisecondi) trascorso dalla chiamata di {@link #startTimer()}.
 	 * @see menu.Utili.startTimer()
 	 */
 	public static String stopTimer() {

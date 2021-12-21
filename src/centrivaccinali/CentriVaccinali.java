@@ -4,9 +4,6 @@
  * Manuel Marceca, 746494, CO
  */
 
-/**
- * Package contenente la classe <code>Indirizzo</code>
- */
 package centrivaccinali;
 
 import java.io.IOException;
@@ -50,27 +47,22 @@ public class CentriVaccinali {
 	
 	/**
 	 * Attributo di tipo <code>String</code> in cui è memorizzata la tipologia di centro vaccinale 
-	 * (ospedaliero, aziendale o HUB).
+	 * (Ospedaliero, Aziendale o Hub).
 	 */
 	String tipologia;
 	
-	
-	/*
-	 * Costruttore rimosso perchè si andranno a modificare i campi una volta creato l'oggetto, come per le altre classi.
-	 */
-	
 	// Lista principali centri vaccinali in Italia : https://www.governo.it/it/cscovid19/report-vaccini/
-	
 	/**
 	 * Registra un centro vaccinale memorizzando i dati nell'oggetto <code>centro</code> e li scrive sul relativo 
 	 * file di testo <code>CentriVaccinali.dati</code>.
 	 * Nel caso in cui tale file non esista, verrà creato.
-	 * Se il file esiste e contiene già un centro con lo stesso nome, <code>null</code> verrà ritornato.
+	 * Se invece il file esiste ma contiene già un centro con lo stesso nome, <code>null</code> verrà ritornato.
 	 * 
 	 * @see menu.MainMenu
 	 * 
 	 * @return <strong>centro</strong>
-	 * 		Un oggetto di tipo <code>CentriVaccinali</code> contenente i dati del centro registrato.
+	 * 		un oggetto di tipo <code>CentriVaccinali</code> contenente i dati del centro registrato.<br>
+	 * 		<strong>null</strong> se il centro con il nome specificato dall'utente era già presente.
 	 * 
 	 * @throws IOException
 	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
@@ -87,7 +79,7 @@ public class CentriVaccinali {
 		// Nel caso non esistesse lo creerebbe ed inserirebbe i nomi dei campi, ...
 		if (!Files.exists(Paths.get(MainMenu.CENTRI_VACCINALI_PATH)))
 			Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true, "NOME;INDIRIZZO;TIPOLOGIA;SEVERITA_MEDIA;NUMERO_SEGNALAZIONI" + Utili.NEW_LINE);
-		// ...nel caso invece esistesse controllerebbe se esiste già un centro con quel nome.
+		// ...nel caso invece esistesse controllerebbe se fosse già presente un centro con quel nome.
 		else {
 			ArrayList<String> centri = Cittadini.cercaCentroVaccinale(centro.nome_centro);
 			for (String centro_vaccinale : centri)
@@ -124,12 +116,10 @@ public class CentriVaccinali {
 	}
 	
 	//Modificato il valore restituito da void a boolean per restituire false se il centro vaccinale in cui si vogliono inserire i dati non esiste;
-	
 	/**
-	 * Registra un vaccinato richiedendo all'utente di inserire i dati, che saranno poi scritti sul file 
-	 * <code>Cittadini_Vaccinati.dati</code>.
-	 * Un nuovo ID viene generato per tale scopo.
-	 * Nel caso in cui tale file non esista, verrà creato.
+	 * Registra un vaccinato richiedendo all'utente di inserire i dati,
+	 * che saranno poi scritti sul file <code>Cittadini_Vaccinati.dati</code>.
+	 * Un nuovo ID viene generato per tale scopo. Nel caso in cui tale file non esista, verrà creato.
 	 * 
 	 * @return <strong>boolean</strong>
 	 * 		In caso di fallimento dell'operazione (centro vaccinale non trovato) <code>false</code> è ritornato.
@@ -172,14 +162,6 @@ public class CentriVaccinali {
 		
 		String file_path = MainMenu.CITTADINI_VACCINATI_PATH;
 		
-//		String ultima_riga = Utili.leggiUltimaRiga(file_path);
-//		if (ultima_riga == null) {
-//			nuovo_id_vaccinazione = "AAAAAAAAAAAAAAAA";
-//		} else {
-//			nuovo_id_vaccinazione = ultima_riga.substring(0, ultima_riga.indexOf(';'));
-//			nuovo_id_vaccinazione = generaId(nuovo_id_vaccinazione);
-//		}
-		
 		String nuovo_id_vaccinazione = generaNuovoId();
 		
 		if (!Files.exists(Paths.get(file_path)))
@@ -200,10 +182,9 @@ public class CentriVaccinali {
 		return true;
 	}
 	
-	
 	/**
 	 * Chiede all'utente di digitare il nome del centro e ne verifica la presenza nel file <code>CentriVaccinali.dati</code>.
-	 * Nel caso nessuna corrispondenza non è trovata, ritorna <code>null</code>.
+	 * Nel caso nessuna corrispondenza è trovata, ritorna <code>null</code>.
 	 * 
 	 * @return <strong>nome_centro</strong>
 	 * 		Il nome del centro a cui corrisponde la ricerca effettuata secondo l'input dell'utente.
@@ -241,38 +222,14 @@ public class CentriVaccinali {
 		return nome_centro;
 	}
 	
-//	private static String generaId(String ultimo_codice) {
-//		char[] nuovo_codice = ultimo_codice.toCharArray();
-//		// Siccome in Java le stringhe sono immutabili, ogni volta che viene eseguita un'operazione di
-//		// concatenazione o modifica di una stringa ne viene creata un'altra che prende il posto di quella
-//		// vecchia, che verrà presto eliminata dal Garbage Collector. La classe StringBuilder è stata
-//		// creata appositamente per costruire una stringa evitando questo
-//		StringBuilder nuovo_codice_str = new StringBuilder();
-//		
-//		nuovo_codice[nuovo_codice.length-1]++;
-//		for (int i = nuovo_codice.length-1; i >= 0; i--) {
-//			if (nuovo_codice[i] == 'Z'+1) {
-//				nuovo_codice[i] = 'A';
-//				nuovo_codice[i-1]++;
-//			}
-//			// Siccome il for va al contrario, appendo alla stringa il carattere in posizione i...
-//			nuovo_codice_str.append(nuovo_codice[i]);
-//		}
-//		
-//		// ... poi la inverto
-//		nuovo_codice_str.reverse();
-//		return nuovo_codice_str.toString();
-//	}
-	
-	
 	/**
-	 * Genera un ID di vaccinazione di 16 caratteri alfanumerici casuale e unico.
-	 * Verifica la presenza o meno dell'ID tra quelli già presenti verificando se è presente nella HashMap.
+	 * Genera un ID di vaccinazione di 16 caratteri alfanumerici casuale e unico,
+	 * verificandone la presenza nella HashMap <code>cittadini_vaccinati</code>.
 	 * 
-	 * @see java.util.HashMap.HashMap<String, Long>()
+	 * @see {@link Cittadini#cittadini_vaccinati}
 	 * 
 	 * @return <strong>codice</strong>
-	 * 		L'ID generato
+	 * 		Una stringa contenente l'ID generato
 	 */
 	private static String generaNuovoId() {
 		StringBuilder nuovo_codice = new StringBuilder();
@@ -298,7 +255,7 @@ public class CentriVaccinali {
 	 * Genera una stringa contenente i dati relativi agli attributi dell'oggetto di tipo <code>CentriVaccinali</code>.
 	 * 
 	 * @return <strong>String</strong>
-	 * 		una stringa contenente i dati contenuti nell'oggetto di tipo  <code>CentriVaccinali</code>
+	 * 		una stringa contenente i dati contenuti nell'oggetto di tipo <code>CentriVaccinali</code>
 	 */
 	@Override
 	public String toString() {
@@ -307,7 +264,7 @@ public class CentriVaccinali {
 
 	
 	/**
-	 * Il main della classe {@link #CentriVaccinali}.
+	 * Il main della classe {@link CentriVaccinali}.
 	 * <p>
 	 * Utilizzato per interagire con l'utente stampando messaggi sul terminale e richiedendo risposte in input.
 	 * 
