@@ -61,7 +61,7 @@ public class Cittadini {
 	 * HashMap contenente delle coppie 'chiave':'valore', in cui la chiave è data dall'ID di vaccinazione del cittadino,
 	 * mentre il valore è la riga in cui quell'ID è scritto nel file <code>Cittadini_Vaccinati.dati</code>.
 	 * 
-	 * @see {@link HashMap#HashMap()}
+	 * @see HashMap
 	 */
 	public static Map<String, Long> cittadini_vaccinati = new HashMap<>();
 	
@@ -75,7 +75,7 @@ public class Cittadini {
 	 * HashMap contenente delle coppie 'chiave':'valore', in cui la chiave è data dall'user ID del cittadino registrato,
 	 * mentre il valore è la riga in cui quell'user ID è scritto nel file <code>Cittadini_Registrati.dati</code>.
 	 * 
-	 * @see {@link HashMap#HashMap()}
+	 * @see HashMap
 	 */
 	public static Map<String, Long> cittadini_registrati = new HashMap<>();
 	
@@ -154,8 +154,8 @@ public class Cittadini {
 	/**
 	 * Permette all'utente di selezionare un criterio di ricerca per trovare un centro vaccinale.
 	 * 
-	 * @see {@link #cercaCentroVaccinale(String nome_centro)}
-	 * @see {@link #cercaCentroVaccinale(String comune, String tipologia)}
+	 * @see #cercaCentroVaccinale(String nome_centro)
+	 * @see #cercaCentroVaccinale(String comune, String tipologia)
 	 * 
 	 * @return {@link #cercaCentroVaccinale(String nome_centro)} oppure {@link #cercaCentroVaccinale(String comune, String tipologia)}
 	 * 		
@@ -541,7 +541,7 @@ public class Cittadini {
 	 * <br> Tali dati sono utilizzati da ogni centro vaccinale per determinare una media dei valori riscontrati per ogni
 	 * sintomo.
 	 * 
-	 * @see {@link #memorizzaEventiAvversi(int[], String[], long)}
+	 * @see #memorizzaEventiAvversi(int[], String[], long)
 	 * 
 	 * @return
 	 * 		<code>true</code> nel caso in cui l'operazione termini con successo.
@@ -877,8 +877,10 @@ public class Cittadini {
 	 * Utilizzato per interagire con l'utente stampando messaggi sul terminale e richiedendo risposte in input.
 	 * 
 	 * @param args
+	 * 		Array di stringhe di utilizzo facoltativo
 	 * 
 	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
 	 */
 	public static void main(String[] args) throws IOException {
 		

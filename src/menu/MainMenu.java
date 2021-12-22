@@ -17,8 +17,8 @@ import java.io.IOException;
  * ricevuto a vaccinazione eseguita per visualizzare eventuali informazioni sui centri vaccinali e
  * dichiarare eventuali eventi avversi riscontrati in seguito alla somministrazione del vaccino.
  * 
- * @see {@link centrivaccinali.CentriVaccinali}
- * @see {@link cittadini.Cittadini}
+ * @see centrivaccinali.CentriVaccinali
+ * @see cittadini.Cittadini
  * 
  * @author Cristian Corti
  * @author Manuel Marceca
@@ -93,7 +93,10 @@ public class MainMenu {
 	 * package <code>centrivaccinali</code> o <code>cittadini</code> saranno eseguiti.
 	 * 
 	 * @param args
+	 * 		Array di stringhe di utilizzo facoltativo
+	 * 
 	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
 	 */
 	public static void main(String[] args) throws IOException {
 		

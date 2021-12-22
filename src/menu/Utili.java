@@ -52,10 +52,10 @@ public abstract class Utili {
 	static long start_time;
 	
 	/**
-	 * <code>NEW_LINE</code> è un oggetto statico e costante di tipo <code>String<code> che contiene il carattere
+	 * <code>NEW_LINE</code> è un oggetto statico e costante di tipo <code>String</code> che contiene il carattere
 	 * new line della macchina su cui è eseguita l'applicazione.
 	 * 
-	 * @see java.lang.System.getProperty(String key)
+	 * @see java.lang.System#getProperty(String)
 	 */
 	public static final String NEW_LINE = System.getProperty("line.separator");  // https://stackoverflow.com/questions/36796136/difference-between-system-getpropertyline-separator-and-n
 	
@@ -298,7 +298,7 @@ public abstract class Utili {
 	 * 
 	 * @return <strong>String</strong>
 	 * 		Come stringa, il tempo (in millisecondi) trascorso dalla chiamata di {@link #startTimer()}.
-	 * @see menu.Utili.startTimer()
+	 * @see menu.Utili#startTimer()
 	 */
 	public static String stopTimer() {
 		return "Execution Time: " + (System.currentTimeMillis() - start_time) + "ms";

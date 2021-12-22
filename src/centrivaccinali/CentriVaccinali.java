@@ -269,7 +269,10 @@ public class CentriVaccinali {
 	 * Utilizzato per interagire con l'utente stampando messaggi sul terminale e richiedendo risposte in input.
 	 * 
 	 * @param args
+	 * 		Array di stringhe di utilizzo facoltativo
+	 * 
 	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
 	 */
 	public static void main(String[] args) throws IOException {
 		// chiede all'utente di inserire ogni campo dell'Indirizzo
