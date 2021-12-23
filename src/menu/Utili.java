@@ -70,11 +70,17 @@ public abstract class Utili {
 	
 	/**
 	 * Stampa un messaggio sulla stream di output "standard" e richiede l'inserimento di input via tastiera,
-	 * il quale sarà restituito.
+	 * il quale sarà restituito. In base al valore del parametro <code>can_be_blank</code> l'utente può inserire
+	 * in input una stringa vuota.
 	 * 
 	 * @param message
 	 * 		Un oggetto di tipo <code>String</code> che rappresenta il messaggio che si vuole mostrare
 	 * 		prima di richiedere l'input all'utente.
+	 * 
+	 * @param can_be_blank
+	 * 		Una variabile di tipo boolean che, se <code>true</code>, permette all'utente di inserire
+	 * 		in input una stringa vuota oppure contenente solo spazi, altrimenti, se <code>false</code>,
+	 * 		richiede esplicitamente di inserire uno o più caratteri.
 	 * 
 	 * @return
 	 * 		La stringa inserita in input.
@@ -82,9 +88,14 @@ public abstract class Utili {
 	 * @throws IOException
 	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
 	 */
-	public static String leggiString(String message) throws IOException {
+	public static String leggiString(String message, boolean can_be_blank) throws IOException {
 		System.out.print(message);
-		return in.readLine();
+		String input = in.readLine();
+		while (!can_be_blank && input.isBlank()) {
+			System.out.print("L'inserimento non può essere vuoto." + Utili.NEW_LINE + message);
+			input = in.readLine();
+		}
+		return input;
 	}
 	
 	/**
@@ -104,7 +115,7 @@ public abstract class Utili {
 	 */
 	public static boolean leggiSiNo(String message) throws IOException {
 		while(true) {
-			String s = leggiString(message + " (Sì / No)" + NEW_LINE + "> ");
+			String s = leggiString(message + " (Sì / No)" + NEW_LINE + "> ", false);
 			switch(s.toLowerCase()) {
 			case "s", "si", "sì":
 				return true;
@@ -153,7 +164,7 @@ public abstract class Utili {
 	}
 	
 	/**
-	 * Memorizza l'output del metodo {@link #leggiString(message)}, il quale richiede l'input all'utente.
+	 * Memorizza l'output del metodo {@link #leggiString(String, boolean)}, il quale richiede l'input all'utente.
 	 * In base all'input fornito, una tra le opzioni "Ospedaliero", "Aziendale" e "Hub" viene selezionata e restituita.
 	 * 
 	 * @see centrivaccinali.CentriVaccinali
@@ -169,7 +180,7 @@ public abstract class Utili {
 	 */
 	public static String inserisciTipologiaCentro(String message) throws IOException {
 		while (true) {
-			String tipologia = leggiString(message);
+			String tipologia = leggiString(message, false);
 			switch (tipologia) {
 			case "1":
 				return "Ospedaliero";

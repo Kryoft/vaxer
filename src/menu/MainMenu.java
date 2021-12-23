@@ -7,6 +7,9 @@
 package menu;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * La classe {@code MainMenu} è il punto di partenza dell'esecuzione dell'applicazione, da cui è possibile,
@@ -113,6 +116,10 @@ public class MainMenu {
 		 */
 		boolean exit = false;
 		
+		Path data_directory = Paths.get("data/");
+		if (Files.notExists(data_directory))
+				Files.createDirectory(data_directory);
+		
 		do {
 			//Menu principale usato per accedere ai main di Cittadini e CentriVaccinali;
 			System.out.println("- Menu Principale -");
@@ -121,7 +128,7 @@ public class MainMenu {
 			System.out.println("2) Cittadini");
 			System.out.println("0) Esci");
 			
-			choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
+			choice = Utili.leggiString(Utili.NEW_LINE + "> ", false).strip();
 			switch (choice) {
 				case "0":
 					exit = true;

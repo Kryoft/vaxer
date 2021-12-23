@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 import cittadini.Cittadini;
@@ -73,7 +74,7 @@ public class CentriVaccinali {
 		CentriVaccinali centro = new CentriVaccinali();
 		
 		System.out.println("Inserisci le informazioni richieste:");
-		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip().replace(";", "");
+		centro.nome_centro = Utili.leggiString("- Nome del centro > ", false).strip().replace(";", "");
 		
 		// Controlla se il file CentriVaccinali.dati esiste già oppure no.
 		// Nel caso non esistesse lo creerebbe ed inserirebbe i nomi dei campi, ...
@@ -89,12 +90,12 @@ public class CentriVaccinali {
 		
 		System.out.println("- Indirizzo:");
 		centro.indirizzo = new Indirizzo();
-		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ", false).strip().replace(";", "").replace(",", "");
 		centro.tipologia = Utili.inserisciTipologiaCentro(String.format("- Tipologia:%s1) Ospedaliero%s2) Aziendale%s3) Hub%s%s> ",
 																			Utili.NEW_LINE,
 																			Utili.NEW_LINE,
@@ -136,12 +137,17 @@ public class CentriVaccinali {
 		 * [...];4, 0, 0, 0, 0, 0;mi fa male la testa, *, *, *, *, *
 		 */
 		
+		if (Files.notExists(Paths.get(MainMenu.CENTRI_VACCINALI_PATH))) {
+			System.out.println("Funzione non disponibile: Nessun centro vaccinale registrato.");
+			return false;
+		}
+		
 		String nome_centro;
 		
 		System.out.println("Inserisci le informazioni richieste:");
-		String nome_cittadino = Utili.leggiString("    1. Nome del Cittadino > ").strip().replace(";", "");
-		String cognome_cittadino = Utili.leggiString("    2. Cognome del Cittadino > ").strip().replace(";", "");
-		String codice_fiscale = Utili.leggiString("    3. Codice Fiscale > ").strip().replace(";", "");
+		String nome_cittadino = Utili.leggiString("    1. Nome del Cittadino > ", false).strip().replace(";", "");
+		String cognome_cittadino = Utili.leggiString("    2. Cognome del Cittadino > ", false).strip().replace(";", "");
+		String codice_fiscale = Utili.leggiString("    3. Codice Fiscale > ", false).strip().replace(";", "");
 		
 		if ((nome_centro = ottieniNomeCentro()) == null)  // prima esegue l'assegnamento a nome_centro (dopo aver chiamato il metodo ottieniNomeCentro), poi verifica la condizione nome_centro == null
 			return false;
@@ -150,7 +156,7 @@ public class CentriVaccinali {
 		Date data_vaccinazione;
 		while (true) {
 			try {
-				data_vaccinazione = sdf.parse(Utili.leggiString("    5. Data della Vaccinazione ('giorno/mese/anno' es. 15/03/2021):"));
+				data_vaccinazione = sdf.parse(Utili.leggiString("    5. Data della Vaccinazione ('giorno/mese/anno' es. 15/03/2021):", false));
 				break;
 			} catch (ParseException e) {
 				System.out.println("Data non valida.");
@@ -158,7 +164,7 @@ public class CentriVaccinali {
 		}
 		String data_vacc = sdf.format(data_vaccinazione);
 		
-		String nome_vaccino = Utili.leggiString("    6. Nome del Vaccino > ").strip().replace(";", "");
+		String nome_vaccino = Utili.leggiString("    6. Nome del Vaccino > ", false).strip().replace(";", "");
 		
 		String file_path = MainMenu.CITTADINI_VACCINATI_PATH;
 		
@@ -199,7 +205,8 @@ public class CentriVaccinali {
 		
 		// loop che fa ricercare e selezionare all'operatore il centro vaccinale dove il cittadino ha eseguito la vaccinazione
 		while (true) {
-			nome_centro = Utili.leggiString("    4. Centro in cui il Cittadino ha eseguito la Vaccinazione (\"*esci\" per annullare) > ");
+			// in questo caso can_be_blank = true così che se l'utente inserisce una stringa vuota tutti i centri vaccinali registrati vengono visualizzati
+			nome_centro = Utili.leggiString("    4. Centro in cui il Cittadino ha eseguito la Vaccinazione (\"*esci\" per annullare) > ", true);
 			centri_trovati = Cittadini.cercaCentroVaccinale(nome_centro);
 			
 			if (nome_centro.equals("*esci"))
@@ -280,8 +287,9 @@ public class CentriVaccinali {
 		String choice;
 		boolean exit = false;
 		
-		if (Cittadini.cittadini_vaccinati.isEmpty()) {
+		if (Cittadini.cittadini_vaccinati == null) {
 			System.out.println("Caricamento Cittadini Vaccinati...");
+			Cittadini.cittadini_vaccinati = new HashMap<>();
 			Cittadini.caricaCittadiniVaccinati();
 			System.out.println("Caricamento Completato." + Utili.NEW_LINE);
 		}
@@ -293,7 +301,7 @@ public class CentriVaccinali {
 			System.out.println("2) Registra nuovo vaccinato");
 			System.out.println("0) Menu Principale");
 			
-			choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
+			choice = Utili.leggiString(Utili.NEW_LINE + "> ", false).strip();
 			switch (choice) {
 				case "0":
 					exit = true;
