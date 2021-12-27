@@ -68,7 +68,7 @@ public class Cittadini {
 	/**
 	 * Memorizza il numero di righe presenti nel file <code>Cittadini_Vaccinati.dati</code>.
 	 */
-	public static long numero_righe_file_cittadini_vaccinati = 0;
+	public static long numero_righe_file_cittadini_vaccinati = 1;  // Va inizializzata ad 1 perché la prima riga contiene i campi
 	
 	// memorizzo la coppia "user_ID, riga" perché memorizzare "user_ID, password" direttamente avrebbe un peso maggiore sulla memoria RAM (la password è sempre di 64 caratteri).
 	/**
@@ -82,7 +82,7 @@ public class Cittadini {
 	/**
 	 * Memorizza il numero di righe presenti nel file <code>Cittadini_Registrati.dati</code>.
 	 */
-	public static long numero_righe_file_cittadini_registrati = 0;
+	public static long numero_righe_file_cittadini_registrati = 1;  // Va inizializzata ad 1 perché la prima riga contiene i campi
 	
 	/**
 	 * Memorizza l'user ID dell'utente correntemente loggato.
@@ -421,10 +421,10 @@ public class Cittadini {
 			ID = s.substring(s.lastIndexOf(';')+1);
 			// Una volta ottenuto l'ID da una riga generica del file Cittadini_Registrati.dati, sono sicuro che
 			// tale ID sia anche in 'cittadini_vaccinati', perché solo i cittadini vaccinati possono aver eseguito
-			// la registrazione. Per quegli ID imposto la riga associata in 'cittadini_vaccinati' negativa, in modo
+			// la registrazione. Perciò per quegli ID imposto la riga associata in 'cittadini_vaccinati' negativa, in modo
 			// che quando trovo un ID con riga negativa so che è già registrato e non permetto una nuova registrazione
 			// con quell'ID. Inoltre, l'informazione riga rimane comunque, è solo negativa, quindi posso sapere a quale
-			// riga è scritto il cittadino con quell'ID nel file Cittadini_Vaccinati.dati
+			// riga è scritto il cittadino con quell'ID nel file Cittadini_Vaccinati.dati semplicemente rendendo tale riga positiva.
 			cittadini_vaccinati.replace(ID, -cittadini_vaccinati.get(ID));
 		}
 		
