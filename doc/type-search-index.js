@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"centrivaccinali","l":"CentriVaccinali"},{"p":"cittadini","l":"Cittadini"},{"p":"centrivaccinali","l":"Indirizzo"},{"p":"menu","l":"MainMenu"},{"p":"menu","l":"Utili"}];updateSearchResults();

@@ -1,5 +1,4 @@
 /*
- * Davide Spinelli, 744151, CO
  * Cristian Corti, 744359, CO
  * Manuel Marceca, 746494, CO
  */
@@ -13,35 +12,74 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 import cittadini.Cittadini;
 import menu.MainMenu;
 import menu.Utili;
 
+/**
+ * 
+ * <code>CentriVaccinali</code> contiene tutte le operazioni necessarie alla gestione dei centri vaccinali,
+ * utilizzando come appoggio vari metodi contenuti in <code>menu.Utili</code>.
+ * 
+ * @see menu.Utili
+ * 
+ * @author Cristian Corti
+ * @author Manuel Marceca
+ *
+ */
 public class CentriVaccinali {
 	
+	/**
+	 * Attributo che memorizza il nome del centro in formato <code>String</code>.
+	 */
 	String nome_centro;
+	
+	/**
+	 * Attributo di tipo <code>Indirizzo</code> che memorizza in un record i dati riguardanti l'indirizzo del 
+	 * relativo centro vaccinale.
+	 * 
+	 * @see centrivaccinali.Indirizzo
+	 */
 	Indirizzo indirizzo;
+	
+	/**
+	 * Attributo di tipo <code>String</code> in cui è memorizzata la tipologia di centro vaccinale 
+	 * (Ospedaliero, Aziendale o Hub).
+	 */
 	String tipologia;
 	
-	/*
-	 * Costruttore rimosso perchè si andranno a modificare i campi una volta creato l'oggetto, come per le altre classi.
-	 */
-	
 	// Lista principali centri vaccinali in Italia : https://www.governo.it/it/cscovid19/report-vaccini/
+	/**
+	 * Registra un centro vaccinale memorizzando i dati nell'oggetto <code>centro</code> e li scrive sul relativo 
+	 * file di testo <code>CentriVaccinali.dati</code>.
+	 * Nel caso in cui tale file non esista, verrà creato.
+	 * Se invece il file esiste ma contiene già un centro con lo stesso nome, <code>null</code> verrà ritornato.
+	 * 
+	 * @see menu.MainMenu
+	 * 
+	 * @return <strong>centro</strong>
+	 * 		un oggetto di tipo <code>CentriVaccinali</code> contenente i dati del centro registrato.<br>
+	 * 		<strong>null</strong> se il centro con il nome specificato dall'utente era già presente.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 * 	
+	 */
 	public static CentriVaccinali registraCentroVaccinale() throws IOException {
 		// Inizializza un oggetto "CentriVaccinali" e successivamente richiede le informazioni necessarie all'utente;
 		CentriVaccinali centro = new CentriVaccinali();
 		
 		System.out.println("Inserisci le informazioni richieste:");
-		centro.nome_centro = Utili.leggiString("- Nome del centro > ").strip().replace(";", "");
+		centro.nome_centro = Utili.leggiString("- Nome del centro > ", false).strip().replace(";", "");
 		
 		// Controlla se il file CentriVaccinali.dati esiste già oppure no.
 		// Nel caso non esistesse lo creerebbe ed inserirebbe i nomi dei campi, ...
 		if (!Files.exists(Paths.get(MainMenu.CENTRI_VACCINALI_PATH)))
 			Utili.scriviSuFile(MainMenu.CENTRI_VACCINALI_PATH, true, "NOME;INDIRIZZO;TIPOLOGIA;SEVERITA_MEDIA;NUMERO_SEGNALAZIONI" + Utili.NEW_LINE);
-		// ...nel caso invece esistesse controllerebbe se esiste già un centro con quel nome.
+		// ...nel caso invece esistesse controllerebbe se fosse già presente un centro con quel nome.
 		else {
 			ArrayList<String> centri = Cittadini.cercaCentroVaccinale(centro.nome_centro);
 			for (String centro_vaccinale : centri)
@@ -51,12 +89,12 @@ public class CentriVaccinali {
 		
 		System.out.println("- Indirizzo:");
 		centro.indirizzo = new Indirizzo();
-		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ").strip().replace(";", "").replace(",", "");
-		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ").strip().replace(";", "").replace(",", "");
+		centro.indirizzo.qualificatore = Utili.leggiString("    1. Qualificatore (via/v.le/pzza/strada/...) > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.nome = Utili.leggiString("    2. Nome (Giuseppe Garibaldi, Roma, ...) > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.numero_civico = Utili.leggiString("    3. Numero Civico > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.comune = Utili.leggiString("    4. Comune > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.sigla_provincia = Utili.leggiString("    5. Sigla della Provincia > ", false).strip().replace(";", "").replace(",", "");
+		centro.indirizzo.cap = Utili.leggiString("    6. CAP > ", false).strip().replace(";", "").replace(",", "");
 		centro.tipologia = Utili.inserisciTipologiaCentro(String.format("- Tipologia:%s1) Ospedaliero%s2) Aziendale%s3) Hub%s%s> ",
 																			Utili.NEW_LINE,
 																			Utili.NEW_LINE,
@@ -78,6 +116,18 @@ public class CentriVaccinali {
 	}
 	
 	//Modificato il valore restituito da void a boolean per restituire false se il centro vaccinale in cui si vogliono inserire i dati non esiste;
+	/**
+	 * Registra un vaccinato richiedendo all'utente di inserire i dati,
+	 * che saranno poi scritti sul file <code>Cittadini_Vaccinati.dati</code>.
+	 * Un nuovo ID viene generato per tale scopo. Nel caso in cui tale file non esista, verrà creato.
+	 * 
+	 * @return <strong>boolean</strong>
+	 * 		In caso di fallimento dell'operazione (centro vaccinale non trovato) <code>false</code> è ritornato.
+	 * 		In caso di successo, <code>true</code> è ritornato.
+	 * 
+	 * @throws IOException	
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static boolean registraVaccinato() throws IOException {
 		/* 
 		 * Campi per il file Cittadini_Vaccinati:
@@ -86,12 +136,17 @@ public class CentriVaccinali {
 		 * [...];4, 0, 0, 0, 0, 0;mi fa male la testa, *, *, *, *, *
 		 */
 		
+		if (Files.notExists(Paths.get(MainMenu.CENTRI_VACCINALI_PATH))) {
+			System.out.println("Funzione non disponibile: Nessun centro vaccinale registrato.");
+			return false;
+		}
+		
 		String nome_centro;
 		
 		System.out.println("Inserisci le informazioni richieste:");
-		String nome_cittadino = Utili.leggiString("    1. Nome del Cittadino > ").strip().replace(";", "");
-		String cognome_cittadino = Utili.leggiString("    2. Cognome del Cittadino > ").strip().replace(";", "");
-		String codice_fiscale = Utili.leggiString("    3. Codice Fiscale > ").strip().replace(";", "");
+		String nome_cittadino = Utili.leggiString("    1. Nome del Cittadino > ", false).strip().replace(";", "");
+		String cognome_cittadino = Utili.leggiString("    2. Cognome del Cittadino > ", false).strip().replace(";", "");
+		String codice_fiscale = Utili.leggiString("    3. Codice Fiscale > ", false).strip().replace(";", "");
 		
 		if ((nome_centro = ottieniNomeCentro()) == null)  // prima esegue l'assegnamento a nome_centro (dopo aver chiamato il metodo ottieniNomeCentro), poi verifica la condizione nome_centro == null
 			return false;
@@ -100,7 +155,7 @@ public class CentriVaccinali {
 		Date data_vaccinazione;
 		while (true) {
 			try {
-				data_vaccinazione = sdf.parse(Utili.leggiString("    5. Data della Vaccinazione ('giorno/mese/anno' es. 15/03/2021):"));
+				data_vaccinazione = sdf.parse(Utili.leggiString("    5. Data della Vaccinazione ('giorno/mese/anno' es. 15/03/2021):", false));
 				break;
 			} catch (ParseException e) {
 				System.out.println("Data non valida.");
@@ -108,17 +163,9 @@ public class CentriVaccinali {
 		}
 		String data_vacc = sdf.format(data_vaccinazione);
 		
-		String nome_vaccino = Utili.leggiString("    6. Nome del Vaccino > ").strip().replace(";", "");
+		String nome_vaccino = Utili.leggiString("    6. Nome del Vaccino > ", false).strip().replace(";", "");
 		
 		String file_path = MainMenu.CITTADINI_VACCINATI_PATH;
-		
-//		String ultima_riga = Utili.leggiUltimaRiga(file_path);
-//		if (ultima_riga == null) {
-//			nuovo_id_vaccinazione = "AAAAAAAAAAAAAAAA";
-//		} else {
-//			nuovo_id_vaccinazione = ultima_riga.substring(0, ultima_riga.indexOf(';'));
-//			nuovo_id_vaccinazione = generaId(nuovo_id_vaccinazione);
-//		}
 		
 		String nuovo_id_vaccinazione = generaNuovoId();
 		
@@ -140,13 +187,26 @@ public class CentriVaccinali {
 		return true;
 	}
 	
+	/**
+	 * Esegue un loop che chiede all'utente di inserire il nome del centro e ne verifica la presenza nel
+	 * file <code>CentriVaccinali.dati</code>. Nel caso in cui uno o più centri siano stati trovati, l'utente può
+	 * selezionarne uno a sua scelta. Nel caso in cui l'utente abbandoni la ricerca, restituisce <code>null</code>.
+	 * 
+	 * @return <strong>nome_centro</strong>
+	 * 		Il nome del centro selezionato a cui corrisponde la ricerca effettuata dall'utente.
+	 * 		Nel caso in cui l'utente inserisca la stringa "*esci", <code>null</code> viene ritornato.
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */		
 	private static String ottieniNomeCentro() throws IOException {
 		String nome_centro;
 		ArrayList<String> centri_trovati;
 		
 		// loop che fa ricercare e selezionare all'operatore il centro vaccinale dove il cittadino ha eseguito la vaccinazione
 		while (true) {
-			nome_centro = Utili.leggiString("    4. Centro in cui il Cittadino ha eseguito la Vaccinazione (\"*esci\" per annullare) > ");
+			// in questo caso can_be_blank = true così che se l'utente inserisce una stringa vuota tutti i centri vaccinali registrati vengono visualizzati
+			nome_centro = Utili.leggiString("    4. Centro in cui il Cittadino ha eseguito la Vaccinazione (\"*esci\" per annullare) > ", true);
 			centri_trovati = Cittadini.cercaCentroVaccinale(nome_centro);
 			
 			if (nome_centro.equals("*esci"))
@@ -169,29 +229,15 @@ public class CentriVaccinali {
 		return nome_centro;
 	}
 	
-//	private static String generaId(String ultimo_codice) {
-//		char[] nuovo_codice = ultimo_codice.toCharArray();
-//		// Siccome in Java le stringhe sono immutabili, ogni volta che viene eseguita un'operazione di
-//		// concatenazione o modifica di una stringa ne viene creata un'altra che prende il posto di quella
-//		// vecchia, che verrà presto eliminata dal Garbage Collector. La classe StringBuilder è stata
-//		// creata appositamente per costruire una stringa evitando questo
-//		StringBuilder nuovo_codice_str = new StringBuilder();
-//		
-//		nuovo_codice[nuovo_codice.length-1]++;
-//		for (int i = nuovo_codice.length-1; i >= 0; i--) {
-//			if (nuovo_codice[i] == 'Z'+1) {
-//				nuovo_codice[i] = 'A';
-//				nuovo_codice[i-1]++;
-//			}
-//			// Siccome il for va al contrario, appendo alla stringa il carattere in posizione i...
-//			nuovo_codice_str.append(nuovo_codice[i]);
-//		}
-//		
-//		// ... poi la inverto
-//		nuovo_codice_str.reverse();
-//		return nuovo_codice_str.toString();
-//	}
-	
+	/**
+	 * Genera un ID di vaccinazione di 16 caratteri alfanumerici casuale e unico,
+	 * verificandone la presenza nella HashMap <code>cittadini_vaccinati</code>.
+	 * 
+	 * @see {@link Cittadini#cittadini_vaccinati}
+	 * 
+	 * @return <strong>codice</strong>
+	 * 		Una stringa contenente l'ID generato
+	 */
 	private static String generaNuovoId() {
 		StringBuilder nuovo_codice = new StringBuilder();
 		String codice;
@@ -211,19 +257,39 @@ public class CentriVaccinali {
 		return codice;
 	}
 	
+	
+	/**
+	 * Genera una stringa contenente i dati relativi agli attributi dell'oggetto di tipo <code>CentriVaccinali</code>.
+	 * 
+	 * @return <strong>String</strong>
+	 * 		una stringa contenente i dati contenuti nell'oggetto di tipo <code>CentriVaccinali</code>
+	 */
 	@Override
 	public String toString() {
 		return String.format("Nome Centro: %s\nIndirizzo: %s\nTipologia: %s", nome_centro, indirizzo.toString(), tipologia);
 	}
 
+	
+	/**
+	 * Il main della classe {@link CentriVaccinali}.
+	 * <p>
+	 * Utilizzato per interagire con l'utente stampando messaggi sul terminale e richiedendo risposte in input.
+	 * 
+	 * @param args
+	 * 		Array di stringhe di utilizzo facoltativo
+	 * 
+	 * @throws IOException
+	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.
+	 */
 	public static void main(String[] args) throws IOException {
 		// chiede all'utente di inserire ogni campo dell'Indirizzo
 		
 		String choice;
 		boolean exit = false;
 		
-		if (Cittadini.cittadini_vaccinati.isEmpty()) {
+		if (Cittadini.cittadini_vaccinati == null) {
 			System.out.println("Caricamento Cittadini Vaccinati...");
+			Cittadini.cittadini_vaccinati = new HashMap<>();
 			Cittadini.caricaCittadiniVaccinati();
 			System.out.println("Caricamento Completato." + Utili.NEW_LINE);
 		}
@@ -235,7 +301,7 @@ public class CentriVaccinali {
 			System.out.println("2) Registra nuovo vaccinato");
 			System.out.println("0) Menu Principale");
 			
-			choice = Utili.leggiString(Utili.NEW_LINE + "> ").strip();
+			choice = Utili.leggiString(Utili.NEW_LINE + "> ", false).strip();
 			switch (choice) {
 				case "0":
 					exit = true;
