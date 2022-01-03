@@ -1,5 +1,4 @@
 /*
- * Davide Spinelli, 744151, CO
  * Cristian Corti, 744359, CO
  * Manuel Marceca, 746494, CO
  */
@@ -364,7 +363,9 @@ public class Cittadini {
 	}
 	
 	/**
-	 * Legge il contenuto di <code>Cittadini_Vaccinati.dati</code> e lo inserisce nella HashMap {@link #cittadini_vaccinati}.
+	 * Legge il contenuto di <code>Cittadini_Vaccinati.dati</code> e per ogni riga inserisce nella HashMap
+	 * {@link #cittadini_vaccinati} l'ID di vaccinazione del cittadino come chiave, e la riga in cui quel'ID
+	 * è scritto come valore.
 	 * 
 	 * @see HashMap
 	 * 
@@ -395,7 +396,9 @@ public class Cittadini {
 	}
 	
 	/**
-	 * Legge il contenuto di <code>Cittadini_Registrati.dati</code> e lo inserisce nella HashMap {@link #cittadini_registrati}.
+	 * Legge il contenuto di <code>Cittadini_Registrati.dati</code> e per ogni riga inserisce nella HashMap
+	 * {@link #cittadini_registrati} l'user ID del cittadino come chiave, e la riga in cui quello user ID
+	 * è scritto come valore.
 	 * 
 	 * @return
 	 * 		<code>true</code> nel caso in cui l'operazione termini con successo.
@@ -488,9 +491,9 @@ public class Cittadini {
 			}
 		}
 		
-		String riga = Utili.leggiRiga(MainMenu.CITTADINI_VACCINATI_PATH, num_riga);
+//		String riga = Utili.leggiRiga(MainMenu.CITTADINI_VACCINATI_PATH, num_riga);
 		
-		riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
+		String riga = String.format("%s;%s;%s;%s;%s;%s;%s%s", 
 				cittadino.user_id,
 				cittadino.nome,
 				cittadino.cognome,
@@ -733,10 +736,7 @@ public class Cittadini {
 		File to_rename = new File(temp_file_path);
 		to_rename.renameTo(to_delete);
 		
-		aggiornaSeveritaMediaENumeroSegnalazioni(dati[4], severita_sul_file, Stream.of(nuove_severita.toString()
-																							.split(","))
-																							.mapToInt(Integer::parseInt)
-																							.toArray());
+		aggiornaSeveritaMediaENumeroSegnalazioni(dati[4], severita_sul_file, nuove_severita_arr);
 	}
 	
 	/**
@@ -892,21 +892,22 @@ public class Cittadini {
 		String choice;
 		boolean exit = false;
 		
+		if (cittadini_vaccinati == null) {
+			System.out.println("Caricamento Cittadini Vaccinati...");
+			cittadini_vaccinati = new HashMap<>();
+			caricaCittadiniVaccinati();
+			System.out.println("Caricamento Completato." + Utili.NEW_LINE);
+		}
+		if (cittadini_registrati == null) {
+			System.out.println("Caricamento Cittadini Registrati...");
+			cittadini_registrati = new HashMap<>();
+			caricaCittadiniRegistrati();
+			System.out.println("Caricamento completato." + Utili.NEW_LINE);
+		}
+		
 		do {
 			System.out.println("- Menu Cittadini -");
 			
-			if (cittadini_vaccinati == null) {
-				System.out.println("Caricamento Cittadini Vaccinati...");
-				cittadini_vaccinati = new HashMap<>();
-				caricaCittadiniVaccinati();
-				System.out.println("Caricamento Completato." + Utili.NEW_LINE);
-			}
-			if (cittadini_registrati == null) {
-				System.out.println("Caricamento Cittadini Registrati...");
-				cittadini_registrati = new HashMap<>();
-				caricaCittadiniRegistrati();
-				System.out.println("Caricamento completato." + Utili.NEW_LINE);
-			}
 			if (logged_userID != null)
 				System.out.println("[Utente corrente: " + logged_userID + "]");
 			

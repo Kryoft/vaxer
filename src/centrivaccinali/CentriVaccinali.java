@@ -1,5 +1,4 @@
 /*
- * Davide Spinelli, 744151, CO
  * Cristian Corti, 744359, CO
  * Manuel Marceca, 746494, CO
  */
@@ -189,12 +188,13 @@ public class CentriVaccinali {
 	}
 	
 	/**
-	 * Chiede all'utente di digitare il nome del centro e ne verifica la presenza nel file <code>CentriVaccinali.dati</code>.
-	 * Nel caso nessuna corrispondenza è trovata, ritorna <code>null</code>.
+	 * Esegue un loop che chiede all'utente di inserire il nome del centro e ne verifica la presenza nel
+	 * file <code>CentriVaccinali.dati</code>. Nel caso in cui uno o più centri siano stati trovati, l'utente può
+	 * selezionarne uno a sua scelta. Nel caso in cui l'utente abbandoni la ricerca, restituisce <code>null</code>.
 	 * 
 	 * @return <strong>nome_centro</strong>
-	 * 		Il nome del centro a cui corrisponde la ricerca effettuata secondo l'input dell'utente.
-	 * 		Nel caso in cui il processo fallisca, <code>null</code> viene ritornato.
+	 * 		Il nome del centro selezionato a cui corrisponde la ricerca effettuata dall'utente.
+	 * 		Nel caso in cui l'utente inserisca la stringa "*esci", <code>null</code> viene ritornato.
 	 * 
 	 * @throws IOException
 	 * 		Viene chiamata un'eccezione nel caso si verifichi un qualsiasi errore legato a input/output.

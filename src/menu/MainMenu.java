@@ -1,5 +1,4 @@
 /*
- * Davide Spinelli, 744151, CO
  * Cristian Corti, 744359, CO
  * Manuel Marceca, 746494, CO
  */
